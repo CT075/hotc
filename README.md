@@ -1,5 +1,3 @@
 This is a test
 
-$$\infer{\infer{\bot & \top}{\top} & \bot}{\bot}$$
-
-$$is mathjax even on?$$
+$$\\infer{\\infer{\\bot & \\top}{\\top} & \\bot}{\\bot}$$
