@@ -1,3 +1,3 @@
 This is a test
 
-$$\\infer{\\infer{\\bot & \\top}{\\top} & \\bot}{\\bot}$$
+$$\begin{array}{cc}x_{11} & x_{12} \\ x_{21} & x_{22}\end{array}$$
