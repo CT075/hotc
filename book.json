@@ -5,8 +5,9 @@
     { "tex" :
       { "macros" :
         { "infer" :
-          [ "\\begin{array}\[b\]{c c c c}\\style{border-bottom:1px solid;}{\\begin{array}\[b\]{c c c c}#3 \\\\\\end{array}} &  \\hspace{-1em}\\raise{-0.5em}{#1} \\\\\\raise{0.5em}#2\\end{array}"
-      , 3 , "" ]
+          [ "\\begin{array}\\[b\\]{c c c c}\\style{border-bottom:1px solid;}{\\begin{array}\\[b\\]{c c c c}#3 \\\\\\end{array}} & \\hspace{-1em}\\raise{-0.5em}{#1} \\\\\\raise{0.5em}#2\\end{array}"
+          , 3
+          , "" ]
         }
       }
     }
