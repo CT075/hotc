@@ -1,3 +1,9 @@
 This is a test
 
-$$\infer[a]{\infer[b]{\bot & \top}{\top} & \bot}{\bot}$$
+$$
+\begin{prooftree}
+\AxiomC{A}
+\AxiomC{B}
+\BinaryInfC{E}
+\end{prooftree}
+$$
