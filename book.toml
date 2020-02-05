@@ -1,0 +1,20 @@
+[book]
+title = "Higher-Order Typed Compilation"
+author = "Cameron Wong transcribed from Karl Crary"
+description = "A transcription of my lecture notes from 15-417"
+
+[build]
+build-dir = "build/"
+create-missing = true
+
+[preprocessor.index]
+
+[preprocessor.links]
+
+[output.html]
+additional-css = []
+mathjax-support = true
+
+[output.html.search]
+limit-results = 15
+
