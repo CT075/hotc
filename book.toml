@@ -4,7 +4,7 @@ author = "Cameron Wong transcribed from Karl Crary"
 description = "A transcription of my lecture notes from 15-417"
 
 [build]
-build-dir = "build/"
+build-dir = "docs/"
 create-missing = true
 
 [preprocessor.index]
