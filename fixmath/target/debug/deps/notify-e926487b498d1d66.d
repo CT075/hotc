@@ -1,0 +1,12 @@
+/home/cam/Documents/Longform/ml-compilation/fixmath/target/debug/deps/notify-e926487b498d1d66.rmeta: /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/lib.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/inotify.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/null.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/poll.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/debounce/mod.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/debounce/timer.rs
+
+/home/cam/Documents/Longform/ml-compilation/fixmath/target/debug/deps/libnotify-e926487b498d1d66.rlib: /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/lib.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/inotify.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/null.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/poll.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/debounce/mod.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/debounce/timer.rs
+
+/home/cam/Documents/Longform/ml-compilation/fixmath/target/debug/deps/notify-e926487b498d1d66.d: /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/lib.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/inotify.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/null.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/poll.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/debounce/mod.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/debounce/timer.rs
+
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/lib.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/inotify.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/null.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/poll.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/debounce/mod.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/notify-4.0.15/src/debounce/timer.rs:

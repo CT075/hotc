@@ -86,7 +86,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="intro.html">Intro</a></li><li class="expanded "><a href="fw/system-f.html"><strong aria-hidden="true">1.</strong> System Fw</a></li></ol>
+                <ol class="chapter"><li class="expanded affix "><a href="index.html">Intro</a></li><li class="expanded "><a href="fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -153,16 +153,66 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#system-f" id="system-f">System F</a></h1>
-<p>Most typed functional languages are based off of System F, the polymorphic
-lambda calculus, and SML is no exception. It is defined by the following rules:</p>
-<p>$$\require{bussproofs}
+                        <h1><a class="header" href="#hot-compilation-spring-2020" id="hot-compilation-spring-2020">HOT Compilation, Spring 2020</a></h1>
+<p>Joining a grand tradition, I'm going to attempt to typeset the lecture notes,
+and will likely inevitably fail and give up halfway through. Good luck!</p>
+<h1><a class="header" href="#system-fw" id="system-fw">System Fw</a></h1>
+<h1><a class="header" href="#system-f" id="system-f">System F</a></h1>
+<p>As a warmup to \(F_\omega\), a brief review of the rules for
+System F.</p>
+<p>\[
+\begin{aligned}
+\tau &amp;:= \alpha \mid \tau \rightarrow \tau \mid \forall \alpha . \tau \\
+e &amp;:= x \mid \lambda (x:\tau).e \mid e\ e \mid \Lambda \alpha.e \mid e[\tau]
+\end{aligned}
+\]</p>
+<p>When typechecking System F, we use two judgments, \(\Gamma \vdash x:
+\tau\) and \(\Gamma \vdash \tau:*\)<sup class="footnote-reference"><a href="#1">1</a></sup>. The latter is often written
+\(\Gamma \vdash \tau\ type\), but we will use this notation so it becomes
+familiar for the future.</p>
+<p>\[\require{bussproofs}
 \begin{prooftree}
-\AxiomC{A}
-\AxiomC{B}
-\BinaryInfC{C}
+\AxiomC{$\Gamma(\alpha)= * $}
+\UnaryInfC{$\Gamma \vdash \alpha: * $}
+\end{prooftree}\qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \tau_1: * $}
+\AxiomC{$\Gamma \vdash \tau_2: * $}
+\BinaryInfC{$\Gamma \vdash \tau_1 \rightarrow \tau_2: * $}
+\end{prooftree}\qquad
+\begin{prooftree}
+\AxiomC{$\Gamma, \alpha:* \vdash \tau : *$}
+\UnaryInfC{$\Gamma \vdash \forall \alpha.\tau : *$}
 \end{prooftree}
-$$</p>
+\]</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma(x) = \tau$}
+\UnaryInfC{$\Gamma \vdash x : \tau$}
+\end{prooftree}\qquad
+\begin{prooftree}
+\AxiomC{$\Gamma, x:\tau_1 \vdash e:\tau_2$}
+\UnaryInfC{$\Gamma \vdash \lambda (x:\tau_1) . e : \tau_1 \rightarrow \tau_2$}
+\end{prooftree}\qquad
+\begin{prooftree}
+\AxiomC{$\Gamma, \alpha:* \vdash e:\tau$}
+\UnaryInfC{$\Gamma \vdash \Lambda \alpha. e : \forall \alpha . \tau$}
+\end{prooftree}
+\]</p>
+<p>The defining feature of System F is the \(\Lambda \alpha.e\) syntax form, with
+its corresponding \(\forall \alpha.e\) type, the so-called &quot;type-lambdas&quot; or
+&quot;polymorphic values&quot;. Just as value lambdas annotate their argument, we may
+also choose to do so with type lambdas, as \(\Lambda (\alpha : *).e\). Then the
+rule for typing big lambda expressions becomes</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma, \alpha:* \vdash e:\tau$}
+\UnaryInfC{$\Gamma \vdash \Lambda \alpha. e : \forall \alpha . \tau$}
+\end{prooftree}
+\]</p>
+<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
+<p>The kind of base types is officially \(T\) for \(type\), but I'm going to follow the Haskell convention of writing it as \(*\).</p>
+</div>
 
                     </main>
 

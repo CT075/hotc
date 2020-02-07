@@ -11,6 +11,10 @@ create-missing = true
 
 [preprocessor.links]
 
+[preprocessor.fixmath]
+command = "fixmath/target/debug/fixmath"
+renderer = ["html"]
+
 [output.html]
 additional-css = []
 mathjax-support = true

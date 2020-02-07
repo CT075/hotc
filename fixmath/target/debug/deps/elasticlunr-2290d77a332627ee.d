@@ -1,0 +1,11 @@
+/home/cam/Documents/Longform/ml-compilation/fixmath/target/debug/deps/elasticlunr-2290d77a332627ee.rmeta: /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/lib.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/config.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/document_store.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/inverted_index.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/lang/mod.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/lang/en.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/pipeline.rs
+
+/home/cam/Documents/Longform/ml-compilation/fixmath/target/debug/deps/elasticlunr-2290d77a332627ee.d: /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/lib.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/config.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/document_store.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/inverted_index.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/lang/mod.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/lang/en.rs /home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/pipeline.rs
+
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/lib.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/config.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/document_store.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/inverted_index.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/lang/mod.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/lang/en.rs:
+/home/cam/.cargo/registry/src/github.com-1ecc6299db9ec823/elasticlunr-rs-2.3.6/src/pipeline.rs:
