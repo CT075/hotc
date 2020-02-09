@@ -25,12 +25,17 @@ fn process_content(s: &String) -> String {
     use ViewMode::*;
     let mut result = String::with_capacity(s.len());
     let mut mode = Wait;
+    let mut output_bussproofs = false;
     for ch in s.chars() {
         match (ch, &mode) {
             ('$', Wait) => mode = SeenDollarRaw,
             ('$', SeenDollarRaw) => {
                 mode = DisplayMath;
-                result.push_str("\\\\[")
+                result.push_str("\\\\[");
+                if !output_bussproofs {
+                    result.push_str("\\require{bussproofs}");
+                    output_bussproofs = true;
+                }
             }
             (_, SeenDollarRaw) => {
                 mode = InlineMath;

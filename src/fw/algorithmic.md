@@ -1,0 +1,3 @@
+# Typechecking $F_\omega$
+
+

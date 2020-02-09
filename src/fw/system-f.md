@@ -15,7 +15,7 @@ When typechecking System F, we use two judgments, $\Gamma \vdash x:
 $\Gamma \vdash \tau\ type$, but we will use this notation so it becomes
 familiar for the future.
 
-$$\require{bussproofs}
+$$
 \begin{prooftree}
 \AxiomC{$\Gamma(\alpha)= \* $}
 \UnaryInfC{$\Gamma \vdash \alpha: \* $}
@@ -55,7 +55,7 @@ rule for typing big lambda expressions becomes
 $$
 \begin{prooftree}
 \AxiomC{$\Gamma, \alpha:\* \vdash e:\tau$}
-\UnaryInfC{$\Gamma \vdash \Lambda \alpha. e : \forall \alpha . \tau$}
+\UnaryInfC{$\Gamma \vdash \Lambda (\alpha:\*). e : \forall \alpha . \tau$}
 \end{prooftree}
 $$
 
