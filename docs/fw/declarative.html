@@ -173,7 +173,7 @@ e := x \mid \lambda (x:\tau).e \mid \Lambda(\alpha:k).e \mid e[\tau]
 \]</p>
 <p>Our context, \(\Gamma\), may contain judgments about types and terms.</p>
 <p>\[
-\Gamma := e \mid \Gamma, x:\tau \mid \Gamma : \alpha:k
+\Gamma := \cdot \mid \Gamma, x:\tau \mid \Gamma : \alpha:k
 \]</p>
 <p>You may also see the kinding judgment written as \(\alpha :: k\).</p>
 <p>Finally, as noted earlier, we will need to extend \(F_\omega\) with primitive
@@ -462,21 +462,6 @@ are well-formed.</p>
 
         </div>
 
-        
-        <!-- Livereload script (if served using the cli tool) -->
-        <script type="text/javascript">
-            var socket = new WebSocket("ws://localhost:3001");
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
         
 
         

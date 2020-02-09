@@ -30,7 +30,7 @@ $$
 Our context, $\Gamma$, may contain judgments about types and terms.
 
 $$
-\Gamma := e \mid \Gamma, x:\tau \mid \Gamma : \alpha:k
+\Gamma := \cdot \mid \Gamma, x:\tau \mid \Gamma : \alpha:k
 $$
 
 You may also see the kinding judgment written as $\alpha :: k$.
