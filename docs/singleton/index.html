@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Unit 1: System Fw - Higher-Order Typed Compilation</title>
+        <title>Unit 2: Singleton kinds - Higher-Order Typed Compilation</title>
         
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html" class="active"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li></ol>
+                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html" class="active"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -151,31 +151,36 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#system-fw" id="system-fw">System Fw</a></h1>
-<p>System \(F_\omega\) is a system of higher-kinded types and type-constructors. It
-is relevant to compiling SML in the way that it relates to the module system.
-If we extend the kind system of &quot;true&quot; \(F_\omega\) with product kinds, we might
-represent the module signature</p>
+                        <h1><a class="header" href="#the-singleton-kind-calculus" id="the-singleton-kind-calculus">The Singleton Kind Calculus</a></h1>
+<p>The next type theory we'll be exploring is the calculus of singleton kinds.
+This is necessary to represent type-fixed signatures, like</p>
 <pre><code class="language-ocaml">sig
-  type t
-  type 'a u
+  type t = int
+  type u
+  val a : t
 end
 </code></pre>
-<p>as the kind \(* \times (* \rightarrow *)\), and so on. This even
-extends to functors that act on modules via type-level lambdas.</p>
+<p>How do we kind this? We can't kind the <code>t</code> tycon at \(*\), because that would
+allow nonconformant structures (say, those assigning <code>t</code> to <code>string</code>) to
+ascribe.</p>
+<p>The answer is to add a new kind constructor <code>S(c)</code> of <em>singleton kinds</em>, kinds
+with only one inhabitant. Set-theoretically, <code>S(c)</code> represents the singleton
+set \({c}\), but that's about where the similarities end.</p>
+<p>It turns out that this simple construct (and its intuitive properties) require
+<em>a lot</em> more power in its machinery.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../fw/algorithmic.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="../fw/system-f.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../singleton/declarative.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -187,13 +192,13 @@ extends to functors that act on modules via type-level lambdas.</p>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a href="../index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a href="../fw/algorithmic.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a href="../fw/system-f.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a href="../singleton/declarative.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

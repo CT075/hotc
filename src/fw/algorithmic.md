@@ -1,4 +1,4 @@
-# Typechecking $F_\omega$
+# Typechecking $F_\omega^{++}$
 
 Algorithmically typechecking $F_\omega$ is more complex. The existence of the
 reflexive, symmetric and transitive equivalence rules may make proof search more

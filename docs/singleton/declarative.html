@@ -1,0 +1,666 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Declarative system - Higher-Order Typed Compilation</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A transcription of my lecture notes from 15-417">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+        <!-- MathJax -->
+        <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html" class="active"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Higher-Order Typed Compilation</h1>
+
+                        <div class="right-buttons">
+                            <a href="../print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#singleton-kinds-declaratively" id="singleton-kinds-declaratively">Singleton kinds, declaratively</a></h1>
+<p>The singleton kind calculus relevant to us is syntactically an extension of
+\(F_\omega\) (plus products), with identical constructors and terms. The kinds,
+of course, are extended with the \(S(c)\) singleton kind. But to fully represent
+modules, we need more power.</p>
+<p>Consider the signature</p>
+<pre><code class="language-ocaml">sig
+  type t
+  type u = t * int
+end
+</code></pre>
+<p>Intuitively, we might write this kind as \(* \times S(t \times \texttt{int})\),
+but this isn't well-formed (the type variable \(t\) is not in scope). This
+necessitates the use of <em>dependent kinds</em>, \(\Sigma\)- and \(\Pi\)-kinds. These
+subsume normal arrow and (non-dependent) product kinds, giving us</p>
+<p>\[\require{bussproofs}k := * \mid S(c) \mid \Sigma(\alpha:k).k \mid \Pi(\alpha:k).k\]</p>
+<p>Of course, we will still use \(k \rightarrow k'\) and \(k \times k'\) as shorthand
+for \(\Pi(\alpha:k).k'\) and \(\Sigma(\alpha:k).k'\) respectively if \(k\) is not
+free in \(k'\).</p>
+<p>The judgments we will use are</p>
+<table><thead><tr><th>Judgment</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>\(\Gamma \vdash k:\text{kind}\)</td><td>Kind validity</td></tr>
+<tr><td>\(\Gamma \vdash k \equiv k' : \text{kind}\)</td><td>Kind equivalence</td></tr>
+<tr><td>\(\Gamma \vdash k \le k'\)</td><td>Subkinding</td></tr>
+<tr><td>\(\Gamma \vdash c: k\)</td><td>Kinding</td></tr>
+<tr><td>\(\Gamma \vdash c \equiv c' : k\)</td><td>Constructor equivalence</td></tr>
+<tr><td>\(\Gamma \vdash e : \tau\)</td><td>Typing (same as \(F_\omega\))</td></tr>
+<tr><td>\(\phantom{\Gamma} \vdash \Gamma\ ok\)</td><td>Context well-formedness</td></tr>
+</tbody></table>
+<p>The addition of singleton kinds necessitates subkinding to handle cases like
+<code>int</code>, which has kind \(*\) but <em>also</em> kind \(S(\texttt{int})\).</p>
+<p><strong>Rules 2.1 (Kind validity):</strong> \(\Gamma \vdash k:\text{kind}\)</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{}
+\UnaryInfC{$\Gamma \vdash * : \text{kind}$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:*$}
+\UnaryInfC{$\Gamma \vdash S(c): \text{kind}$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k_1:\text{kind}$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash k_2:\text{kind}$}
+\BinaryInfC{$\Gamma \vdash \Pi(\alpha:k_1).k_2:\text{kind}$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k_1:\text{kind}$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash k_2:\text{kind}$}
+\BinaryInfC{$\Gamma \vdash \Sigma(\alpha:k_1).k_2:\text{kind}$}
+\end{prooftree}
+\]</p>
+<p><strong>Rules 2.2 (Kind equivalence):</strong> \(\Gamma \vdash k \equiv k' : \text{kind}\)</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{}
+\UnaryInfC{$\Gamma \vdash * \equiv * : \text{kind}$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c \equiv c' : *$}
+\UnaryInfC{$\Gamma \vdash S(c) \equiv S(c') :\text{kind}$}
+\end{prooftree}
+\]</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k_1 \equiv k_1' : \text{kind}$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash k_2 \equiv k_2' : \text{kind}$}
+\BinaryInfC{$\Gamma \vdash \Pi(\alpha:k_1).k_2 \equiv \Pi(\alpha:k_1').k_2'$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k_1 \equiv k_1' : \text{kind}$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash k_2 \equiv k_2' : \text{kind}$}
+\BinaryInfC{$\Gamma \vdash \Sigma(\alpha:k_1).k_2 \equiv \Sigma(\alpha:k_1').k_2'$}
+\end{prooftree}
+\]</p>
+<p>Before moving onward, we'll need some more machinery. By the above rules, we
+can only define singleton kinds for <em>types</em> (constructors kinded at \(*\)). As
+a typechecking mechanism, this is important, lest someone write <code>type t = list</code>. When declaring our whole system, however, this can be inconvenient.
+Let us define the
+<em>generalized singleton</em> \(S(c:k)\) be defined as follows:</p>
+<p>\[
+\begin{aligned}
+S(c:*) &amp;\triangleq S(c) \\
+S(c:\Pi(\alpha:k_1).k_2) &amp;\triangleq \Pi(\alpha:k_1).S(c\ \alpha : k_2) \\
+S(c:\Sigma(\alpha:k_1).k_2) &amp;\triangleq
+S(\pi_1c : k_1) \times S(\pi_2c:[\pi_1c/\alpha]k_2) \\
+S(c:S(c')) &amp;\triangleq S(c)
+\end{aligned}
+\]</p>
+<p>Note that the \(\Sigma\) clause could be more concisely written as
+\(\Sigma(\alpha:S(\pi_1c:k_1)).S(\pi_2c:k_2)\), but we choose to expand it out
+for clarity. Ideally, this definition should fit to the following condition
+(written as a derived rule):</p>
+<p>\[
+\begin{prooftree}
+\alwaysDashedLine
+\AxiomC{$\Gamma \vdash c:k$}
+\AxiomC{$\vdash \Gamma\ ok$}
+\BinaryInfC{$\Gamma \vdash S(c:k)\ ok$}
+\end{prooftree}
+\]</p>
+<p>which it does.</p>
+<p>Why is all this necessary? Previously, when checking constructor equivalence,
+neither \(\Gamma\) nor \(k\) were used. But what about in this system?</p>
+<p>\[
+\lambda (\alpha:*) . \alpha \overset{?}{=} \lambda (\alpha:*) . \texttt{int}
+\]</p>
+<p>Before, we would say that this is &quot;obviously false&quot;. Calling one on a type that
+is not <code>int</code> demonstrates this. But now, with
+subkinding, we might say that</p>
+<p>\[\cdot \vdash \lambda (\alpha:*) . \alpha : S(\texttt{int}) \rightarrow *\]</p>
+<p>because \(S(\texttt{int}) \le *\). But then, these two lambdas should be
+equivalent, because if \(\alpha : S(\texttt{int})\), then \(\alpha\) must be
+(equivalent to) \(\texttt{int}\) itself! So clearly the kind we are checking at
+matters.</p>
+<p>Similarly, we need the context as well. Consider</p>
+<p>\[
+\beta (\lambda(\alpha:*).\alpha) \overset{?}{=} \beta(\lambda(\alpha:*).\texttt{int})
+\]</p>
+<p>Now, the kind of \(\beta\) fixes the kinds of the lambdas (which, as we saw
+above, matters).</p>
+<p><strong>Rules 2.3 (Subkinding):</strong> \(\Gamma \vdash k \le k'\)</p>
+<p><em>Preorder</em>:
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k \equiv k':\text{kind}$}
+\UnaryInfC{$\Gamma \vdash k \le k'$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k_1 \le k_2$}
+\AxiomC{$\Gamma \vdash k_2 \le k_3$}
+\BinaryInfC{$\Gamma \vdash k_1 \le k_3$}
+\end{prooftree}
+\]</p>
+<p><em>Other</em>:
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:*$}
+\UnaryInfC{$\Gamma \vdash S(c) \le *$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c \equiv c' : *$}
+\RightLabel{$*$}
+\UnaryInfC{$\Gamma \vdash S(c) \le S(c')$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k_1' \le k_1$}
+\AxiomC{$\Gamma, \alpha:k_1' \vdash k_2 \le k_2'$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash k_2 : \text{kind}$}
+\TrinaryInfC{$\Gamma \vdash \Pi(\alpha:k_1).k_2 \le \Pi(\alpha:k_1').k_2'$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k_1 \le k_1'$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash k_2 \le k_2'$}
+\AxiomC{$\Gamma, \alpha:k_1' \vdash k_2' : \text{kind}$}
+\TrinaryInfC{$\Gamma\vdash\Sigma(\alpha:k_1).k_2\le\Sigma(\alpha:k_1').k_2'$}
+\end{prooftree}
+\]</p>
+<p>The starred rule is actually unnecessary, as it falls out from the symmetry
+rule.</p>
+<p>The rule for \(\Pi\) types flips the direction of the input kind, as functions
+are known to be contravariant. When checking the dependent parts of \(\Pi\) and
+\(\Sigma\), it is important that our context holds that \(\alpha\) is the <em>larger</em>
+kind, as it will work for both comparands. Finally, we must check that certain
+subkinds are well-formed, as this won't necessarily fall out from proving other
+premises.</p>
+<p><strong>Rules 2.4.1 (Kinding, incomplete):</strong> \(\Gamma \vdash c:k\)</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma(\alpha) = k$}
+\UnaryInfC{$\Gamma \vdash \alpha : k$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma, \alpha:k \vdash c:k'$}
+\AxiomC{$\Gamma \vdash k:\text{kind}$}
+\BinaryInfC{$\Gamma \vdash \lambda(\alpha:k).c : \Pi(\alpha:k).k'$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1:\Pi(\alpha:k).k'$}
+\AxiomC{$\Gamma \vdash c_2:k$}
+\BinaryInfC{$\Gamma \vdash c_1\ c_2:[c_2/\alpha]k'$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:\Sigma(\alpha:k_1).k_2$}
+\UnaryInfC{$\Gamma \vdash \pi_1c : k_1$}
+\end{prooftree}\qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:\Sigma(\alpha:k_1).k_2$}
+\UnaryInfC{$\Gamma \vdash \pi_2c : [\pi_1c/\alpha]k_2$}
+\end{prooftree}
+\]</p>
+<p>The major missing rule is the one kinding type-level tuples. There is one
+obvious candidate:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1:k_1$}
+\AxiomC{$\Gamma \vdash c_2:[c_1/\alpha]k_2$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash k_2:\text{kind}$}
+\TrinaryInfC{$\Gamma \vdash \langle c_1,c_2 \rangle:\Sigma(\alpha:k_1).k_2$}
+\end{prooftree}
+\]</p>
+<p>There is also the rule for non-dependent tuples:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1:k_1$}
+\AxiomC{$\Gamma \vdash c_2:k_2$}
+\BinaryInfC{$\Gamma \vdash \langle c_1,c_2 \rangle : k_1 \times k_2$}
+\end{prooftree}
+\]</p>
+<p>which clearly falls out from the first rule. It turns out, however, that these
+two formulations are actually <em>equivalent</em> (under subsumption). Suppose we are
+given \(\Gamma \vdash c_1:k_1\), \(\Gamma \vdash c_2:[c_1/alpha]k_2\) and that the
+kinds are well-formed. Then</p>
+<ul>
+<li>We have \(\Gamma \vdash c_1:S(c_1:k_1)\) by how we defined generalized singletons</li>
+<li>\(\Gamma \vdash \langle c_1, c_2 \rangle : S(c_1:k_1) \times [c_1/\alpha]k_2\)
+by the non-dependent product rule.</li>
+<li>\(\alpha\) is not free in \([c_1/\alpha]k_2\), so \(\Gamma, \alpha:S(c_1:k_1) \vdash
+[c_1/\alpha]k_2 \le k_2\).</li>
+<li>So \(\Gamma \vdash S(c_1:k_1) \times [c_1/\alpha]k_2 \le \Sigma(\alpha:k_1).k_2\).</li>
+<li>Then by subsumption, \(\Gamma \vdash \langle c_1, c_2 \rangle : \Sigma(\alpha:k_1).
+k_2\).  It turns out that using the non-dependent product rule is ultimately much
+simpler, so we will use it over the dependent version.</li>
+</ul>
+<p>We complete rules 2.4 (for now) with singletons, arrows and \(\forall\):</p>
+<p><strong>Rules 2.4.2 (Kinding continued, still incomplete):</strong></p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1:k_1$}
+\AxiomC{$\Gamma \vdash c_2:k_2$}
+\BinaryInfC{$\Gamma \vdash \langle c_1,c_2 \rangle : k_1 \times k_2$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c \equiv c': *$}
+\UnaryInfC{$\Gamma \vdash c : S(c')$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \tau_1:*$}
+\AxiomC{$\Gamma \vdash \tau_2:*$}
+\BinaryInfC{$\Gamma \vdash \tau_1 \rightarrow \tau_2:*$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k:\text{kind}$}
+\AxiomC{$\Gamma, \alpha:k \vdash \tau:*$}
+\BinaryInfC{$\Gamma \vdash \forall(\alpha:k).\tau : *$}
+\end{prooftree}
+\]</p>
+<p>The rule for singletons should be unsurprising, and the rules for arrow and
+\(\forall\) types are unchanged from system \(F_\omega\).</p>
+<p>At last, then, we come to constructor equivalence. The general theme will be
+to use dependent versions of the rules we had before.</p>
+<p><strong>Rules 2.5 (Constructor equivalence):</strong> \(\Gamma \vdash c \equiv c'\)</p>
+<p><em>Equivalence:</em>
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:k$}
+\UnaryInfC{$\Gamma \vdash c \equiv c:k$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c \equiv c' : k$}
+\UnaryInfC{$\Gamma \vdash c' \equiv c : k$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1 \equiv c_2:k$}
+\AxiomC{$\Gamma \vdash c_2 \equiv c_3:k$}
+\BinaryInfC{$\Gamma \vdash c_1 \equiv c_3:k$}
+\end{prooftree}
+\]</p>
+<p><em>Compatibility:</em>
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k_1 \equiv k_1' : \text{kind}$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash c \equiv c':k_2$}
+\BinaryInfC{$\Gamma \vdash \lambda(\alpha:k_1).c \equiv \lambda(\alpha:k_1').c':
+\Pi(\alpha:k_1).k_2$}
+\end{prooftree} \quad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1 \equiv c_1' : \Pi(\alpha:k_1).k_2$}
+\AxiomC{$\Gamma \vdash c_2 \equiv c_2' : k_2$}
+\BinaryInfC{$\Gamma \vdash c_1\ c_2 \equiv c_1'\ c_2' : [c_2/\alpha]k_2$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1 \equiv c_1' : k_1$}
+\AxiomC{$\Gamma \vdash c_2 \equiv c_2' : [c/\alpha]k_2$}
+\BinaryInfC{$\Gamma \vdash \langle c_1, c_2 \rangle \equiv \langle c_1', c_2' \rangle
+: \Sigma(\alpha:k_1).k_2$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c \equiv c' : \Sigma(\alpha:k_1).k_2$}
+\UnaryInfC{$\Gamma \vdash \pi_1c \equiv \pi_1c':k_1$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c \equiv c' : \Sigma(\alpha:k_1).k_2$}
+\UnaryInfC{$\Gamma \vdash \pi_2c \equiv \pi_2c':[\pi_1c/\alpha]k_2$}
+\end{prooftree}
+\]</p>
+<p><em>Types constructors:</em>
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1 \equiv c_1' : *$}
+\AxiomC{$\Gamma \vdash c_2 \equiv c_2' : *$}
+\BinaryInfC{$\Gamma \vdash c_1\rightarrow c_2 \equiv c_1' \rightarrow c_2':*$}
+\end{prooftree}\qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k \equiv k' : \text{kind}$}
+\AxiomC{$\Gamma, \alpha:k \vdash c \equiv c' : *$}
+\BinaryInfC{$\Gamma \vdash \forall(\alpha:k).c\equiv\forall(\alpha:k').c':*$}
+\end{prooftree}
+\]</p>
+<p><em>Beta-reduction:</em>
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1:k_1$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash c_2:k_2$}
+\BinaryInfC{$\Gamma \vdash (\lambda(\alpha:k_1).c_2)\ c_1
+\equiv [c_1/\alpha]c_2 : [c_1/\alpha]k_2$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1 : k_1$}
+\AxiomC{$\Gamma \vdash c_2 : k_2$}
+\BinaryInfC{$\Gamma \vdash \pi_1 \langle c_1, c_2 \rangle \equiv c_1$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c_1 : k_1$}
+\AxiomC{$\Gamma \vdash c_2 : k_2$}
+\BinaryInfC{$\Gamma \vdash \pi_2 \langle c_1, c_2 \rangle \equiv c_2$}
+\end{prooftree}
+\]</p>
+<p><em>Extensionality:</em>
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:\Pi(\alpha:k_1).k_2'$}
+\AxiomC{$\Gamma \vdash c':\Pi(\alpha:k_1).k_2''$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash c\ \alpha \equiv c'\ \alpha : k_2$}
+\TrinaryInfC{$\Gamma \vdash c \equiv c' : \Pi(\alpha:k_1).k_2$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \pi_1c \equiv \pi_1c' : k_1$}
+\AxiomC{$\Gamma \vdash \pi_2c \equiv \pi_2c' : [\pi_1c/\alpha]k_2$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash k_2:\text{kind}$}
+\TrinaryInfC{$\Gamma \vdash c \equiv c' : \Sigma(\alpha:k_2)$}
+\end{prooftree}
+\]</p>
+<p>Finally, we may choose to include a singleton rule:</p>
+<p>\[
+\begin{prooftree}
+\alwaysDashedLine
+\AxiomC{$\Gamma \vdash c:S(c')$}
+\UnaryInfC{$\Gamma \vdash c \equiv c':S(c')$}
+\end{prooftree}
+\]</p>
+<p>but it's unnecessary, as it arises inversion of the singleton rule from 2.4.2.</p>
+<p>It turns out, however, that our formulation of constructor kinding isn't quite
+complete. Consider the following situation.</p>
+<p>Recall that \(S(c:\Pi(\alpha:k_1).k_2 = \Pi(\alpha:k_1).S(c\ \alpha : k_2)\).
+Then consider the type constructor \(\lambda(\alpha:*).\texttt{int}\):</p>
+<p>\[
+\begin{aligned}
+\lambda(\alpha:*).\texttt{int} &amp;: S(\lambda(\alpha:*).\texttt{int}:* \rightarrow *)
+\\
+&amp;= \Pi(\alpha:*).S((\lambda(\alpha:*).\texttt{int})\ \alpha : *) \\
+&amp;= \Pi(\alpha:*).S((\lambda(\alpha:*).\texttt{int})\ \alpha) \\
+&amp;= \Pi(\alpha:*).S(\texttt{int})
+\end{aligned}
+\]</p>
+<p>(where the \(=\) above are kind equality)</p>
+<p>By this, we should be able to derive \(\lambda(\alpha:*).\texttt{int}:
+\Pi(\alpha:*).S(\texttt{int})\). This can be done easily:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{}
+\UnaryInfC{$\alpha:* \vdash \texttt{int} : S(\texttt{int})$}
+\UnaryInfC{$\cdot \vdash \lambda(\alpha:\texttt{int}).\texttt{int}
+: \Pi(\alpha:*).S(\texttt{int})$}
+\end{prooftree}
+\]</p>
+<p>which should follow from our existing rules.</p>
+<p>However, this doesn't generalize. Namely, we should be able to show that, if
+\(\beta:S(* \rightarrow *)\), then \(\beta:\Pi(\alpha:*).S(\beta\ \alpha)\).
+As our rules currently are, however, we can't do this -- our rules currently
+only allow type lambdas and beta- or pi-redexes to have \(\Pi\)-types, and the
+singular variable \(\beta\) is neither. A similar issue arises with product kinds.
+We can resolves this by giving up the
+structural-only property of the constructor kinding rules and adding
+extensionality there as well:</p>
+<p><strong>Rules 2.4.3 (Kinding finalized)</strong></p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:\Pi(\alpha:k_1).k_2'$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash c\ \alpha:k_2$}
+\BinaryInfC{$\Gamma \vdash c:\Pi(\alpha:k_1).k_2$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \pi_1c:k_1$}
+\AxiomC{$\Gamma \vdash \pi_2c:[\pi_1c/\alpha]k_2$}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash k_2:\text{kind}$}
+\TrinaryInfC{$\Gamma \vdash c:\Sigma(\alpha:k_1).k_2$}
+\end{prooftree}
+\]</p>
+<h2><a class="header" href="#remarks" id="remarks">Remarks</a></h2>
+<ul>
+<li>I'm a bit sketched on how the proof of non-dependent products implying dependent
+products works. The moral reason is that the dependent argument must have a
+fully instantiated kind, so it doesn't matter whether the actual sum kind
+is dependent, but the subtyping via the generalized singleton doesn't quite
+make sense to me. Maybe I'll do the full proof out later.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../singleton/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../singleton/algorithmic.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="../singleton/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="../singleton/algorithmic.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3001");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
