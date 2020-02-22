@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html" class="active"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li></ol>
+                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html" class="active"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="../binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="../cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="../cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -171,15 +171,15 @@ subsume normal arrow and (non-dependent) product kinds, giving us</p>
 for \(\Pi(\alpha:k).k'\) and \(\Sigma(\alpha:k).k'\) respectively if \(k\) is not
 free in \(k'\).</p>
 <p>The judgments we will use are</p>
-<table><thead><tr><th>Judgment</th><th>Meaning</th></tr></thead><tbody>
-<tr><td>\(\Gamma \vdash k:\text{kind}\)</td><td>Kind validity</td></tr>
-<tr><td>\(\Gamma \vdash k \equiv k' : \text{kind}\)</td><td>Kind equivalence</td></tr>
-<tr><td>\(\Gamma \vdash k \le k'\)</td><td>Subkinding</td></tr>
-<tr><td>\(\Gamma \vdash c: k\)</td><td>Kinding</td></tr>
-<tr><td>\(\Gamma \vdash c \equiv c' : k\)</td><td>Constructor equivalence</td></tr>
-<tr><td>\(\Gamma \vdash e : \tau\)</td><td>Typing (same as \(F_\omega\))</td></tr>
-<tr><td>\(\phantom{\Gamma} \vdash \Gamma\ ok\)</td><td>Context well-formedness</td></tr>
-</tbody></table>
+<p>| Judgment | Meaning |
+|---|---|
+| \(\Gamma \vdash k:\text{kind}\) | Kind validity |
+| \(\Gamma \vdash k \equiv k' : \text{kind}\) | Kind equivalence |
+| \(\Gamma \vdash k \le k'\) | Subkinding |
+| \(\Gamma \vdash c: k\) | Kinding |
+| \(\Gamma \vdash c \equiv c' : k\) | Constructor equivalence |
+| \(\Gamma \vdash e : \tau\) | Typing (same as \(F_\omega\)) |
+| \(\phantom{\Gamma} \vdash \Gamma\ ok\) | Context well-formedness |</p>
 <p>The addition of singleton kinds necessitates subkinding to handle cases like
 <code>int</code>, which has kind \(*\) but <em>also</em> kind \(S(\texttt{int})\).</p>
 <p><strong>Rules 2.1 (Kind validity):</strong> \(\Gamma \vdash k:\text{kind}\)</p>

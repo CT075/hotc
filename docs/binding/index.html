@@ -1,0 +1,424 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Aside: Binding - Higher-Order Typed Compilation</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A transcription of my lecture notes from 15-417">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+        <!-- MathJax -->
+        <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="../binding/index.html" class="active"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="../cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="../cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Higher-Order Typed Compilation</h1>
+
+                        <div class="right-buttons">
+                            <a href="../print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#binding" id="binding">Binding</a></h1>
+<p>Up to now, when writing rules &quot;on the whiteboard&quot;, we have been blase about our
+syntactic representation of variables and binding. In particular, all the rules
+given only make sense if we implicitly assume that all rules apply up to alpha
+equivalence, and that all substitutions are capture-avoiding. In doing so,
+however, we necessarily gloss over any details of what an actual program
+implementing these algorithms may need to ensure these invariants are upheld.</p>
+<p>We now give some discussion on how these may be implemented in an actual
+compiler. In the structural code for this class, we will use a hybrid of the
+techniques discussed here -- terms will use explicit variables and constructors
+will use De Bruijin indices. Past this explanation, we will continue to use the
+notation for explicit variables everywhere, which should be implicitly converted
+to De Bruijin where appropriate.</p>
+<h2><a class="header" href="#explicit-variables" id="explicit-variables">Explicit Variables</a></h2>
+<p>Consider (syntactically) the lambda calculus whose terms consist of variables,
+lambda abstractions, and applications. Variables and bindings are &quot;explicit&quot;,
+represented and differentiated with a literal string of characters (say \(x\)).
+This has the example of being extremely simple to read, and has comparatively
+few pitfalls to other approaches.</p>
+<p>What would a substitution function on these terms look like? Certainly,
+substituting into a variable or an application is easy. What about the lambda
+case?</p>
+<p>\[\require{bussproofs}
+\begin{aligned}[]
+[M/x]\lambda x.N &amp;= \lambda x.N \hfill&amp; \\
+[M/x]\lambda y.N &amp;= \lambda y.[M/x]N \hfill&amp; (y \not\in FV(M)) \\
+[M/x]\lambda y.N &amp;= \lambda y'.[M/x][y/y']N \hfill&amp; (y' \ne x, y \in FV(M),
+y' \not\in FV(M))
+\end{aligned}
+\]</p>
+<p>In the first case, we ignore the substitution -- the variable \(x\) is bound in
+the lambda, so any suboccurrences of \(x\) aren't free (and thus shouldn't be
+subbed). In the other two cases, we are forced to check whether \(y\) is free in
+the substitutee \(M\), traversing the entire term each time. Then, if it is free
+in \(M\), we <em>also</em> need to traverse the subterm \(N\) to alpha-vary it properly.</p>
+<p>This is, as you may have surmised, not an ideal state of affairs. One
+alternative is to just <em>always</em> alpha-vary the bound term, giving us the clause</p>
+<p>\[
+\begin{aligned}[]
+[M/x]\lambda y.N &amp;= \lambda y'.[M/x][y/y']N \hfill&amp; (x \ne y, y' \ne x, y' \ne FV(M))
+\end{aligned}
+\]</p>
+<p>where we generate a fresh variable each time. This is marginally better for
+simplicity, but now requires us to traverse the subterm \(N\) every time.</p>
+<h2><a class="header" href="#de-bruijin-indices" id="de-bruijin-indices">De Bruijin Indices</a></h2>
+<p>Clearly, we need a better way. Another alternative we can use is <em>De Bruijin
+indices</em>, in which a variable is represented by the number of binders between
+the variable itself and its introduction. So the term \(\lambda x.x\ (\lambda y.
+x\ y)\) would be written as \(\lambda . 0\ (\lambda. 1\ 0)\).</p>
+<p>Related is the idea of De Bruijin <em>levels</em>, which count the indices backwards,
+from the <em>outermost</em> binder. However, these are unwieldy and nobody uses them,
+so we won't either.</p>
+<p>Our substitution function, then, will look like this (remember that \(i\) and \(j\)
+are <em>natural numbers</em> here):</p>
+<p>\[
+\begin{aligned}[]
+[M/i]i &amp;= M \\
+[M/i]j &amp;= j-1 \hfill&amp; (j &gt; i) \\
+[M/i]j &amp;= j   \hfill&amp; (j \lt i) \\
+[M/i](N_1\ N_2) &amp;= [M/i]N_1\ ([M/i]N_2) \\
+[M/i]\lambda.N &amp;= \lambda.[M\uparrow^1_0/i+1]N
+\end{aligned}
+\]</p>
+<p>where \(\uparrow\) is an operation that shifts the variables in a subterm (to be
+defined). If \(j \lt i\), on the other hand, we can leave it be, as there isn't
+an intermediate binding that has been removed.</p>
+<p>In the \(j &gt; i\) case, we need to lower the variable by 1, because if we're
+substituting for it, it means we've removed a binding site (namely, the binding
+\(i\)).</p>
+<p>When going underneath a binder (in the \(\lambda\)-abstraction case), we need to
+adjust any variables in the substitutee \(M\) to account for the extra binder --
+if \(M\) refers to some free variable at index \(0\), then that needs to become
+index \(1\) once we go underneath the lambda binder. This is where the \(\uparrow\)
+operation comes in:</p>
+<p>\[
+\begin{aligned}[]
+i \uparrow^j_k &amp;= i + j \hfill&amp; (i \ge k) \\
+i \uparrow^j_k &amp;= i \hfill&amp; (\text{otherwise}) \\
+(M\ N) \uparrow^j_k &amp;= (M \uparrow^j_k)\ (N \uparrow^j_k) \\
+(\lambda.M) \uparrow^j_k &amp;= \lambda.(M \uparrow^j_{k+1})
+\end{aligned}
+\]</p>
+<p>Let's try this on some concrete examples. Consider the eta rule for \(\Pi\)-kinds:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash c\ \alpha:k_2$}
+\UnaryInfC{$\Gamma \vdash c : \Pi(\alpha:k_1).k_2$}
+\end{prooftree}
+\]</p>
+<p>Under De Bruijin, this becomes</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma, k_1 \vdash c\uparrow^1_0\ 0 : k_2$}
+\UnaryInfC{$\Gamma \vdash c : \Pi(k_1).k_2$}
+\end{prooftree}
+\]</p>
+<p>In the premise, we need to upshift any variables in the constructor \(c\), because
+we're adding a new variable (namely, \(\alpha\)) without going underneath an
+explicit binding site.</p>
+<p>What about application?</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:\Pi(\alpha:k_1).k_2$}
+\AxiomC{$\Gamma \vdash c':k_1$}
+\BinaryInfC{$\Gamma \vdash c\ c' : [c'/\alpha]k_2$}
+\end{prooftree}
+\]</p>
+<p>This becomes</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:\Pi(k_1).k_2$}
+\AxiomC{$\Gamma \vdash c':k_1$}
+\BinaryInfC{$\Gamma \vdash c\ c' : [c'/0]k_2$}
+\end{prooftree}
+\]</p>
+<p>Here, because of how we defined substitution, we can avoid needing to do the
+explicit downshift that comes from instantiating the \(\alpha\) binding.</p>
+<h2><a class="header" href="#explicit-substitutions" id="explicit-substitutions">Explicit substitutions</a></h2>
+<p>When working with such a representation, it can often be extremely unwieldy to
+need to use the above definition for every substitution. Instead, we can use a
+compositional representation acting on terms. Let \(\sigma\) be the syntactic
+class of substitutions, which are, spiritually, functions from term to term,
+applied as \(M[\sigma]\) (the reverse of the usual notation). Some presentations
+of this system may even add \(M[\sigma]\) to the grammar as a term itself (called
+a &quot;closure&quot;, confusingly), but we will not, for simplicit. We have</p>
+<p>\[
+\begin{aligned}
+\sigma &amp;:= \uparrow^i \mid M.\sigma \\
+\end{aligned}
+\]</p>
+<p>where \(M.\sigma\) is the substitution replacing variable \(0\) with \(M\) and
+performing \(\sigma\) to \(i-1\) for each other variable \(i\). We will also define
+the substitution \(id\) to be \(\uparrow^0\).</p>
+<p>The substitution \([M_0/0, M_1/1, M_2/2]\), then, will be represented by the
+operation \(M_0.M_1.M_2.id\).</p>
+<p>With substitutions now represented as first-class, it makes sense to define the
+composition of substitutions. Namely, we want \(\sigma \circ \sigma'\) to be
+the transformation such that \(M[\sigma \circ \sigma'] = (M[\sigma])[\sigma']\).</p>
+<p>Our application rules become:</p>
+<p>\[\begin{aligned}
+0[M.\sigma] &amp;= M \\
+i+1[M.\sigma] &amp;= i[\sigma] \\
+i [\uparrow^j] &amp;= i+j \\
+(N\ P)[\sigma] &amp;= (N[\sigma]\ P[\sigma]) \\
+(\lambda.M)[\sigma] &amp;= \lambda.(M[0.(\sigma \circ \uparrow^1)])
+\end{aligned}
+\]</p>
+<p>with composition defined as</p>
+<p>\[\begin{aligned}
+(M.\sigma) \circ \sigma' &amp;= (M[\sigma']) . (\sigma \circ \sigma') \\
+\uparrow^i \circ \uparrow^j &amp;= \uparrow^{i+j} \\
+id \circ M.\sigma &amp;= M.\sigma \\
+\uparrow^{i+1} \circ M.\sigma &amp;= \uparrow^i \circ \sigma
+\end{aligned}
+\]</p>
+<p>Suppose, then, that we wanted to apply an operation \(\sigma\) to the second
+variable in our binding list. To do that with what we have, we'd need to leave
+all \(0\)s and \(1\)s untouched. We can do that with</p>
+<p>\[
+\sigma \rightsquigarrow 0.(\sigma \circ \uparrow) \rightsquigarrow
+0.((0.(\sigma \circ \uparrow)) \circ \uparrow)
+\]</p>
+<p>where \(\rightsquigarrow\) is a transformation shifting a substitution to act
+under one binding, and the last term is equal to</p>
+<p>\[
+0.(0[\uparrow].(\sigma \circ \uparrow) \circ \uparrow) =
+0.1.(\sigma \circ \uparrow^2)
+\]</p>
+<p>This suggests a pattern:</p>
+<p>\[
+under_i(\sigma) = 0.1.\dots.i-1.\sigma \circ \uparrow^i
+\]</p>
+<p>which is to apply the operation \(\sigma\) under \(i\) bindings.</p>
+<p>A typical use case may look like</p>
+<p>\[
+0.1.\dots.i-1.M_1[\uparrow^i].\dots.M_j[\uparrow^i].\uparrow^{i+k}
+\]</p>
+<p>In the starter code, this pattern is implemented for us as the function</p>
+<pre><code class="language-ocaml">subst_term : nat -&gt; term list -&gt; nat -&gt; subst
+</code></pre>
+<h2><a class="header" href="#remarks" id="remarks">Remarks</a></h2>
+<ul>
+<li>I always find it simplest to think of the variable \(0\) as being an index into
+the ordered context list. In this way, any time something is added to the
+context <em>without</em> an explicit binder, it makes sense to increment the
+internal vars.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../singleton/algorithmic.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../cps/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="../singleton/algorithmic.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="../cps/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3001");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

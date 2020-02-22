@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html" class="active"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li></ol>
+                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html" class="active"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="../binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="../cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="../cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -394,16 +394,22 @@ see whether the relevant constructors behave equivalently.</p>
 unnecessary, as they are uniquely determined by the kinding rules.</p>
 <p><strong>Theorem (Regularity)</strong>.</p>
 <ol>
-<li>If \(\vdash \Gamma\ ok\) and \(\Gamma \vdash e:\tau\), then \(\Gamma \vdash \tau:*\).</li>
-<li>If \(\vdash \Gamma\ ok\) and \(\Gamma \vdash c \equiv c':k\), then \(\Gamma \vdash
-c:k\) and \(\Gamma \vdash c':k\)</li>
+<li>
+<p>If \(\vdash \Gamma\ ok\) and \(\Gamma \vdash e:\tau\), then \(\Gamma \vdash \tau:*\).</p>
+</li>
+<li>
+<p>If \(\vdash \Gamma\ ok\) and \(\Gamma \vdash c \equiv c':k\), then \(\Gamma \vdash
+c:k\) and \(\Gamma \vdash c':k\)
+<em>Proof</em>.</p>
+</li>
+<li>
+<p>By induction over the judgment \(\Gamma \vdash e:\tau\).</p>
+</li>
+<li>
+<p>By induction over the judgment \(\Gamma \vdash c \equiv c':k\).
+\(\square\)</p>
+</li>
 </ol>
-<p><em>Proof</em>.</p>
-<ol>
-<li>By induction over the judgment \(\Gamma \vdash e:\tau\).</li>
-<li>By induction over the judgment \(\Gamma \vdash c \equiv c':k\).</li>
-</ol>
-<p>\(\square\)</p>
 <p>where \(\vdash \Gamma\ ok\) is a judgment ensuring that all types in \(\Gamma\)
 are well-formed.</p>
 <p><strong>Rules 1.4 (Well-formed contexts)</strong>: \(\vdash \Gamma\ ok\)

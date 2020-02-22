@@ -15,6 +15,10 @@ create-missing = true
 command = "fixmath/target/debug/fixmath"
 renderer = ["html"]
 
+[preprocessor.diagrammer]
+command = "diagrammer/target/debug/diagrammer"
+renderer = ["html"]
+
 [output.html]
 additional-css = []
 mathjax-support = true

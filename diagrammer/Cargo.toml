@@ -1,0 +1,14 @@
+[package]
+name = "diagrammer"
+version = "0.1.0"
+authors = ["Cameron Wong <cjwong@andrew.cmu.edu>"]
+edition = "2018"
+
+[dependencies]
+mdbook = "0.3.5"
+clap = "2.33.0"
+pulldown-cmark = "0.6.1"
+pulldown-cmark-to-cmark = "2.0.1"
+serde_json = "1.0.46"
+svgbob = "0.4.1"
+regex = "1.3.4"

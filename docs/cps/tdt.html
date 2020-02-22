@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Unit 2: Singleton kinds - Higher-Order Typed Compilation</title>
+        <title>Primer: Type-directed translation - Higher-Order Typed Compilation</title>
         
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html" class="active"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="../binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="../cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="../cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li></ol></li></ol>
+                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="../binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="../cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="../cps/tdt.html" class="active"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -151,38 +151,136 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#the-singleton-kind-calculus" id="the-singleton-kind-calculus">The Singleton Kind Calculus</a></h1>
-<p>The next type theory we'll be exploring is the calculus of singleton kinds.
-This is necessary to represent type-fixed signatures, like</p>
-<pre><code class="language-ocaml">sig
-  type t = int
-  type u
-  val a : t
-end
-</code></pre>
-<p>How do we kind this? We can't kind the <code>t</code> tycon at \(*\), because that would
-allow nonconformant structures (say, those assigning <code>t</code> to <code>string</code>) to
-ascribe.</p>
-<p>The answer is to add a new kind constructor <code>S(c)</code> of <em>singleton kinds</em>, kinds
-with only one inhabitant. Set-theoretically, <code>S(c)</code> represents the singleton
-set \({c}\), but that's about where the similarities end.</p>
-<p>It turns out that this simple construct (and its intuitive properties) require
-<em>a lot</em> more power in its machinery.</p>
+                        <h1><a class="header" href="#type-directed-translation" id="type-directed-translation">Type-directed Translation</a></h1>
+<p>As usual, before we get into a full discussion of CPS, we'll need to develop
+some more machinery.</p>
+<p>Usually, language translations are &quot;syntax-directed&quot;, a translation judgment
+defined inductively over the syntax tree. Between two types of lambda calculi,
+for example, we might define our translation like this:</p>
+<p>\[\require{bussproofs}
+\begin{aligned}
+\overline{x} &amp;= x \\
+\overline{\lambda (x:\tau).e} &amp;= \lambda(x:\overline{\tau}).\overline{e} \\
+\overline{e_1\ e_2} &amp;= \overline{e_1}\ \overline{e_2}
+\end{aligned}
+\]</p>
+<p>where the the translation can be determined solely by looking at the particular
+syntactic form.</p>
+<p>One problem: This doesn't always work.</p>
+<p>For example, consider translating a language with booleans into System
+\(F_\omega\). Under a standard Church encoding, we'd translate the type <code>bool</code> as</p>
+<p>\[
+\overline{bool} = \forall(\alpha:*).(\alpha \rightarrow \alpha \rightarrow \alpha)
+\]</p>
+<p>with the corresponding introduction forms</p>
+<p>\[
+\begin{aligned}
+\overline{true} &amp;= \Lambda \alpha.\lambda(x:\alpha).\lambda(y:\alpha).x \\
+\overline{false} &amp;= \Lambda \alpha.\lambda(x:\alpha).\lambda(y:\alpha).y \\
+\end{aligned}
+\]</p>
+<p>A problem, however, comes when trying to translate the elimination form:</p>
+<p>\[
+\overline{if\ e_1\ then\ e_2\ else\ e_3} = \overline{e_1}[\tau]\ \overline{e_2}
+\ \overline{e_3}
+\]</p>
+<p>What type should we use for \(\tau\)? It should be the type of \(e_1\) and \(e_2\),
+but without actually running a typechecker, we won't know what type that is! To
+deal with this, we can use a <em>type-directed</em> translation, which couples the
+translation step with the typechecking/type synthesis process.</p>
+<p>Of course, there are really <em>two</em> typing judgments here, one for the source and
+one for the target language. These are usually notated</p>
+<p>\[
+\begin{aligned}
+\Gamma \vdash_S e:\tau \\
+\Gamma \vdash_T e:\tau
+\end{aligned}
+\]</p>
+<p>for <strong>s</strong>ource and <strong>t</strong>arget, respectively. However, we will elide the
+subscripts in cases where the context makes it clear, typically when we know
+what language the given term is in.</p>
+<p>Our translation judgment, then, becomes</p>
+<p>\[\Gamma \vdash_S e:\tau \rightsquigarrow e'\]</p>
+<p>where \(e\) is in the source and \(e'\) is in the target language.</p>
+<p>Note that we can actually use a syntax-directed translation of constructors,
+kinds and contexts. For a more complex constructor language, we may need to
+perform a <em>kind</em>-directed translation, but thankfully that is not the case here.</p>
+<p>A translation, then, should have the following regularity conditions:</p>
+<ol>
+<li>\(\Gamma \vdash_S \tau: *\) if and only if \(\overline{\Gamma} \vdash_T
+\overline{\tau}: *\).</li>
+<li>\(\Gamma \vdash_S e:\tau\) if and only if there exists some \(e'\) such that
+\(\Gamma \vdash_S e:\tau \rightsquigarrow e'\).</li>
+<li>If \(\Gamma \vdash_S e:\tau \rightsquigarrow e'\), then \(\overline{\Gamma}
+\vdash_T e':\overline{\tau}\) (static correctness).</li>
+</ol>
+<p>You might think that, since we have a notion of static correctness, we may also
+have some form of <em>dynamic</em> correctness to preserve. Loosely, this might be
+phrased as &quot;If \(\Gamma \vdash e:\tau \rightsquigarrow e'\), then \(e\) and \(e'\)
+'do the same thing'&quot;. However, it is actually quite difficult to even state
+this formally! Certainly, we can't state this without having some formal notion
+of dynamic behavior, which we won't be dealing with in this class. It turns out
+that these proofs are also quite involved, which is another reason we don't
+bother.</p>
+<p>A type-directed translation rule will always follow the same form of the
+associated regular typing rule, where the premises are also a translation. The
+variable translation rule, for example might look like this:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma(x) = \tau$}
+\UnaryInfC{$\Gamma \vdash x:\tau \rightsquigarrow x$}
+\end{prooftree}
+\]</p>
+<p>In general, it is best not to touch variable names. If we do start messing with
+variable names, we'll need to ensure freshness, perform substitutions on
+subterms, and so on -- not worth it at all.</p>
+<p>Returning to the if-then-else example, we can now express the correct
+translation (assuming the usual rule for typing if-then-else):</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:bool \rightsquigarrow e_1'$}
+\AxiomC{$\Gamma \vdash e_2:\tau \rightsquigarrow e_2'$}
+\AxiomC{$\Gamma \vdash e_3:\tau \rightsquigarrow e_3'$}
+\TrinaryInfC{$\Gamma \vdash if\ e_1\ then\ e_2\ else\ e_3:\tau
+\rightsquigarrow e_1'[\overline{\tau}]\ e_2'\ e_3'$}
+\end{prooftree}
+\]</p>
+<p>Finally, note that these rules will need to be adjusted somewhat to work with
+the algorithmic type synthesis and type checking rules.</p>
+<p>Although we have not given a full formal system, we can sketch out what a proof
+of the regularity conditions may look like:</p>
+<ol>
+<li>Depends on the specifics of the kind system, but often follows via
+induction on the kinding judgment (in both directions).</li>
+<li>The forward direction is fairly clear, as we design our rules to follow
+from the source typing judgment. The backwards direction is even easier,
+as we can simply delete the translations from every premise and conclusion
+to show what we need.</li>
+<li>Was not given in lecture; can be proven relatively easily for yourself.</li>
+</ol>
+<h2><a class="header" href="#remarks" id="remarks">Remarks</a></h2>
+<ul>
+<li>In lecture, Prof. Crary chose to use \(\overline{e}\) as the &quot;output&quot; of the
+translation judgment, where \(\overline{\cdot}\) here is not acting as an
+operator, just taking the symbol \(\overline{e}\) as a suggestive variable
+name. I have taken the liberty of rephrasing the rules to use something
+else for the sake of my own confusion.</li>
+<li>I did a few cases of the proof of the translation from IL-Direct to IL-CPS
+and it seems to be fairly trivial. The third condition can be shown by
+induction over the translation rules, but is muddied by the presence of
+different syntactic classes.</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../fw/algorithmic.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../cps/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
-                        
-                            <a rel="next" href="../singleton/declarative.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -192,15 +290,11 @@ set \({c}\), but that's about where the similarities end.</p>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a href="../fw/algorithmic.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a href="../cps/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
-                
-                    <a href="../singleton/declarative.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
                 
             </nav>
 

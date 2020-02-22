@@ -86,7 +86,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="index.html">Intro</a></li><li class="expanded "><a href="fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li></ol>
+                <ol class="chapter"><li class="expanded affix "><a href="index.html">Intro</a></li><li class="expanded "><a href="fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -170,6 +170,336 @@ material is... well, not lifted, but definitely influenced by his explanations.<
 <p>I will do my best to keep my personal comments restricted to the remarks. Any
 mistakes are mine. These notes will include no more SML code than was presented
 in lecture.</p>
+<p><a href="https://github.com/CT075/hotc">source</a></p>
+<h2><a class="header" href="#structure-of-the-compiler" id="structure-of-the-compiler">Structure of the Compiler</a></h2>
+<p>The compiler developed by this class will follow the following progression:</p>
+<svg class="bob" font-family="arial" font-size="14" height="720" width="264" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="triangle" markerHeight="8" markerWidth="8" orient="auto" refX="4" refY="2" viewBox="0 0 8 4">
+<polygon class="fg_fill" points="0,0 0,4 8,2 0,0"/>
+</marker>
+<marker id="clear_triangle" markerHeight="10" markerWidth="10" orient="auto" refX="1" refY="7" viewBox="0 0 20 14">
+<polygon class="bg_fill" points="2,2 2,12 18,7 2,2"/>
+</marker>
+<marker id="circle" markerHeight="5" markerWidth="5" orient="auto" refX="10" refY="10" viewBox="0 0 20 20">
+<circle class="fg_fill" cx="10" cy="10" r="8"/>
+</marker>
+<marker id="square" markerHeight="5" markerWidth="5" orient="auto" refX="10" refY="10" viewBox="0 0 20 20">
+<rect class="fg_fill" height="20" width="20" x="0" y="0"/>
+</marker>
+<marker id="open_circle" markerHeight="10" markerWidth="10" orient="auto" refX="10" refY="10" viewBox="0 0 20 20">
+<circle class="bg_fill" cx="10" cy="10" r="4"/>
+</marker>
+<marker id="big_open_circle" markerHeight="20" markerWidth="20" orient="auto" refX="20" refY="20" viewBox="0 0 40 40">
+<circle class="bg_fill" cx="20" cy="20" r="6"/>
+</marker>
+</defs>
+<style type="text/css">
+rect.backdrop {
+    fill: white;
+}
+text{
+    fill: black;
+}
+circle {
+    fill: none;
+    stroke: black;
+    stroke-width: 2;
+}
+line {
+    stroke: black;
+    stroke-width: 2;
+    stroke-opacity: 1;
+    fill-opacity: 1;
+    stroke-linecap: round;
+    stroke-linejoin: miter;
+}
+path {
+    fill: none;
+    stroke: black;
+    stroke-width: 2;
+    stroke-opacity: 1;
+    fill-opacity: 1;
+    stroke-linecap: round;
+    stroke-linejoin: miter;
+}
+line.dashed {
+    stroke-dasharray: 5;
+}
+.fg_fill {
+    fill: black;
+}
+.bg_fill {
+    fill: white;
+    stroke: black;
+    stroke-width: 2;
+}
+tspan.head{
+    fill: none;
+    stroke: none;
+}
+</style>
+<rect class="backdrop" height="720" width="264" x="0" y="0"/>
+<g>
+<line x1="4" x2="4" y1="8" y2="40"/>
+<line x1="4" x2="100" y1="8" y2="8"/>
+<line x1="4" x2="52" y1="40" y2="40"/>
+<line x1="52" x2="52" y1="40" y2="104"/>
+<line x1="52" x2="100" y1="40" y2="40"/>
+<line x1="52" x2="100" y1="104" y2="104"/>
+<line x1="100" x2="100" y1="8" y2="40"/>
+<line x1="100" x2="100" y1="104" y2="136"/>
+</g>
+<g>
+<line x1="4" x2="4" y1="104" y2="136"/>
+<line x1="4" x2="52" y1="104" y2="104"/>
+<line x1="4" x2="52" y1="136" y2="136"/>
+<line x1="52" x2="52" y1="136" y2="200"/>
+<line x1="52" x2="100" y1="136" y2="136"/>
+<line x1="52" x2="100" y1="200" y2="200"/>
+<line x1="100" x2="100" y1="200" y2="232"/>
+</g>
+<g>
+<line x1="4" x2="4" y1="200" y2="232"/>
+<line x1="4" x2="52" y1="200" y2="200"/>
+<line x1="4" x2="52" y1="232" y2="232"/>
+<line x1="52" x2="52" y1="232" y2="296"/>
+<line x1="52" x2="100" y1="232" y2="232"/>
+<line x1="52" x2="100" y1="296" y2="296"/>
+<line x1="100" x2="100" y1="296" y2="328"/>
+</g>
+<g>
+<line x1="4" x2="4" y1="296" y2="328"/>
+<line x1="4" x2="52" y1="296" y2="296"/>
+<line x1="4" x2="52" y1="328" y2="328"/>
+<line x1="52" x2="52" y1="328" y2="392"/>
+<line x1="52" x2="100" y1="328" y2="328"/>
+<line x1="52" x2="108" y1="392" y2="392"/>
+<line x1="108" x2="108" y1="392" y2="424"/>
+</g>
+<g>
+<line x1="4" x2="4" y1="392" y2="424"/>
+<line x1="4" x2="52" y1="392" y2="392"/>
+<line x1="4" x2="52" y1="424" y2="424"/>
+<line x1="52" x2="52" y1="424" y2="488"/>
+<line x1="52" x2="108" y1="424" y2="424"/>
+<line x1="52" x2="100" y1="488" y2="488"/>
+<line x1="100" x2="100" y1="488" y2="520"/>
+</g>
+<g>
+<line x1="4" x2="4" y1="488" y2="520"/>
+<line x1="4" x2="52" y1="488" y2="488"/>
+<line x1="4" x2="52" y1="520" y2="520"/>
+<line x1="52" x2="52" y1="520" y2="584"/>
+<line x1="52" x2="100" y1="520" y2="520"/>
+<line x1="52" x2="100" y1="584" y2="584"/>
+<line x1="100" x2="100" y1="584" y2="616"/>
+</g>
+<g>
+<line x1="4" x2="4" y1="584" y2="616"/>
+<line x1="4" x2="52" y1="584" y2="584"/>
+<line x1="4" x2="52" y1="616" y2="616"/>
+<line x1="52" x2="52" y1="616" y2="680"/>
+<line x1="52" x2="100" y1="616" y2="616"/>
+<line x1="52" x2="100" y1="680" y2="680"/>
+<line x1="100" x2="100" y1="680" y2="712"/>
+</g>
+<g>
+<line x1="4" x2="4" y1="680" y2="712"/>
+<line x1="4" x2="52" y1="680" y2="680"/>
+<line x1="4" x2="100" y1="712" y2="712"/>
+</g>
+<g>
+<text x="25" y="124">
+IL-Module
+</text>
+</g>
+<g>
+<text x="25" y="220">
+IL-Direct
+</text>
+</g>
+<g>
+<text x="25" y="412">
+IL-Closure
+</text>
+</g>
+<g>
+<text x="25" y="508">
+IL-Hoist
+</text>
+</g>
+<g>
+<text x="25" y="604">
+IL-Alloc
+</text>
+</g>
+<g>
+<text x="33" y="316">
+IL-CPS
+</text>
+</g>
+<g>
+<text x="41" y="28">
+SML
+</text>
+</g>
+<g>
+<text x="49" y="700">
+C
+</text>
+</g>
+<g>
+<text x="65" y="76">
+Elaboration
+</text>
+</g>
+<g>
+<text x="65" y="172">
+Phase-splitting
+</text>
+</g>
+<g>
+<text x="65" y="268">
+CPS
+</text>
+</g>
+<g>
+<text x="65" y="364">
+Closure Conversion
+</text>
+</g>
+<g>
+<text x="65" y="460">
+Hoisting
+</text>
+</g>
+<g>
+<text x="65" y="556">
+Allocation/Type Erasure
+</text>
+</g>
+<g>
+<text x="65" y="652">
+Code
+</text>
+</g>
+<g>
+<text x="97" y="268">
+Conversion
+</text>
+</g>
+<g>
+<text x="105" y="652">
+generation
+</text>
+</g>
+<g>
+<text x="113" y="28">
+(AST)
+</text>
+</g>
+</svg>
+<p>where each <code>IL-</code> language is some intermediate form. Until IL-Alloc, each
+intermediary language is also typed, which will aid in ensuring that the passes
+are well-formed.</p>
+<p>It is possible to preserve types all the way down, foregoing the type erasure
+leading into IL-Alloc. Such compilers often have an &quot;hourglass effect&quot;, in
+which the intermediary typesystems get increasingly simple down to a point, at
+which they become more complex again. Consider a typed memory representation of
+the sum type \(A+B\), for example. We have to store a tag (for which variant)
+along with the object itself, giving us a layout of</p>
+<svg class="bob" font-family="arial" font-size="14" height="48" width="104" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="triangle" markerHeight="8" markerWidth="8" orient="auto" refX="4" refY="2" viewBox="0 0 8 4">
+<polygon class="fg_fill" points="0,0 0,4 8,2 0,0"/>
+</marker>
+<marker id="clear_triangle" markerHeight="10" markerWidth="10" orient="auto" refX="1" refY="7" viewBox="0 0 20 14">
+<polygon class="bg_fill" points="2,2 2,12 18,7 2,2"/>
+</marker>
+<marker id="circle" markerHeight="5" markerWidth="5" orient="auto" refX="10" refY="10" viewBox="0 0 20 20">
+<circle class="fg_fill" cx="10" cy="10" r="8"/>
+</marker>
+<marker id="square" markerHeight="5" markerWidth="5" orient="auto" refX="10" refY="10" viewBox="0 0 20 20">
+<rect class="fg_fill" height="20" width="20" x="0" y="0"/>
+</marker>
+<marker id="open_circle" markerHeight="10" markerWidth="10" orient="auto" refX="10" refY="10" viewBox="0 0 20 20">
+<circle class="bg_fill" cx="10" cy="10" r="4"/>
+</marker>
+<marker id="big_open_circle" markerHeight="20" markerWidth="20" orient="auto" refX="20" refY="20" viewBox="0 0 40 40">
+<circle class="bg_fill" cx="20" cy="20" r="6"/>
+</marker>
+</defs>
+<style type="text/css">
+rect.backdrop {
+    fill: white;
+}
+text{
+    fill: black;
+}
+circle {
+    fill: none;
+    stroke: black;
+    stroke-width: 2;
+}
+line {
+    stroke: black;
+    stroke-width: 2;
+    stroke-opacity: 1;
+    fill-opacity: 1;
+    stroke-linecap: round;
+    stroke-linejoin: miter;
+}
+path {
+    fill: none;
+    stroke: black;
+    stroke-width: 2;
+    stroke-opacity: 1;
+    fill-opacity: 1;
+    stroke-linecap: round;
+    stroke-linejoin: miter;
+}
+line.dashed {
+    stroke-dasharray: 5;
+}
+.fg_fill {
+    fill: black;
+}
+.bg_fill {
+    fill: white;
+    stroke: black;
+    stroke-width: 2;
+}
+tspan.head{
+    fill: none;
+    stroke: none;
+}
+</style>
+<rect class="backdrop" height="48" width="104" x="0" y="0"/>
+<g>
+<line x1="4" x2="4" y1="8" y2="40"/>
+<line x1="4" x2="52" y1="8" y2="8"/>
+<line x1="4" x2="52" y1="40" y2="40"/>
+<line x1="52" x2="52" y1="8" y2="40"/>
+<line x1="52" x2="100" y1="8" y2="8"/>
+<line x1="52" x2="100" y1="40" y2="40"/>
+<line x1="100" x2="100" y1="8" y2="40"/>
+</g>
+<g>
+<text x="17" y="28">
+tag
+</text>
+</g>
+<g>
+<text x="65" y="28">
+obj
+</text>
+</g>
+</svg>
+<p>Our typesystem must be powerful enough to express these layouts
+accurately, hence the extra complexity. This may continue all the
+way down to, say, a typed assembly language. In this class, however, we only
+have enough time to cover up to IL-Alloc, and will thus generate C from there.</p>
 <h1><a class="header" href="#system-fw" id="system-fw">System Fw</a></h1>
 <p>System \(F_\omega\) is a system of higher-kinded types and type-constructors. It
 is relevant to compiling SML in the way that it relates to the module system.
@@ -481,16 +811,22 @@ see whether the relevant constructors behave equivalently.</p>
 unnecessary, as they are uniquely determined by the kinding rules.</p>
 <p><strong>Theorem (Regularity)</strong>.</p>
 <ol>
-<li>If \(\vdash \Gamma\ ok\) and \(\Gamma \vdash e:\tau\), then \(\Gamma \vdash \tau:*\).</li>
-<li>If \(\vdash \Gamma\ ok\) and \(\Gamma \vdash c \equiv c':k\), then \(\Gamma \vdash
-c:k\) and \(\Gamma \vdash c':k\)</li>
+<li>
+<p>If \(\vdash \Gamma\ ok\) and \(\Gamma \vdash e:\tau\), then \(\Gamma \vdash \tau:*\).</p>
+</li>
+<li>
+<p>If \(\vdash \Gamma\ ok\) and \(\Gamma \vdash c \equiv c':k\), then \(\Gamma \vdash
+c:k\) and \(\Gamma \vdash c':k\)
+<em>Proof</em>.</p>
+</li>
+<li>
+<p>By induction over the judgment \(\Gamma \vdash e:\tau\).</p>
+</li>
+<li>
+<p>By induction over the judgment \(\Gamma \vdash c \equiv c':k\).
+\(\square\)</p>
+</li>
 </ol>
-<p><em>Proof</em>.</p>
-<ol>
-<li>By induction over the judgment \(\Gamma \vdash e:\tau\).</li>
-<li>By induction over the judgment \(\Gamma \vdash c \equiv c':k\).</li>
-</ol>
-<p>\(\square\)</p>
 <p>where \(\vdash \Gamma\ ok\) is a judgment ensuring that all types in \(\Gamma\)
 are well-formed.</p>
 <p><strong>Rules 1.4 (Well-formed contexts)</strong>: \(\vdash \Gamma\ ok\)
@@ -522,22 +858,22 @@ so one approach for checking whether two constructors are equivalent is to
 beta-normalize them, then compare them structurally. This would work, but does
 not generalize well to later systems.</p>
 <p>The immediately relevant judgments are:</p>
-<table><thead><tr><th>Judgment</th><th>Meaning</th></tr></thead><tbody>
-<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \Rightarrow \overset{-}{k}\)</td><td>kind synthesis</td></tr>
-<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \Leftarrow \overset{+}{k}\)</td><td>kind checking</td></tr>
-<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{e} \Rightarrow \overset{-}{\tau}\)</td><td>type sythesis</td></tr>
-<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{e} \Leftarrow \overset{+}{\tau}\)</td><td>type checking</td></tr>
-</tbody></table>
+<p>| Judgment | Meaning |
+|---|---|
+| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \Rightarrow \overset{-}{k}\) | kind synthesis |
+| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \Leftarrow \overset{+}{k}\) | kind checking |
+| \(\overset{+}{\Gamma} \vdash \overset{+}{e} \Rightarrow \overset{-}{\tau}\) | type sythesis |
+| \(\overset{+}{\Gamma} \vdash \overset{+}{e} \Leftarrow \overset{+}{\tau}\) | type checking |</p>
 <p>The \(+\) and \(-\) symbols denote modality (\(+\) is input and \(-\) is output), but
 are not otherwise necessary. These
 judgments form a standard bidirectional typechecking (and kind-checking) algorithm.</p>
 <p>In the process, we will also need four more judgments:</p>
-<table><thead><tr><th>Judgment</th><th>Meaning</th></tr></thead><tbody>
-<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \Leftrightarrow \overset{+}{c'} : \overset{+}{k}\)</td><td>algorithmic equivalence</td></tr>
-<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \leftrightarrow \overset{+}{c'} : \overset{-}{k}\)</td><td>structural equivalence</td></tr>
-<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \Downarrow \overset{-}{c'}\)</td><td>weak-head normalization</td></tr>
-<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \rightsquigarrow \overset{-}{c'}\)</td><td>weak-head reduction</td></tr>
-</tbody></table>
+<p>| Judgment | Meaning |
+|---|---|
+| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \Leftrightarrow \overset{+}{c'} : \overset{+}{k}\) | algorithmic equivalence |
+| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \leftrightarrow \overset{+}{c'} : \overset{-}{k}\) | structural equivalence |
+| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \Downarrow \overset{-}{c'}\) | weak-head normalization |
+| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \rightsquigarrow \overset{-}{c'}\) | weak-head reduction |</p>
 <h2><a class="header" href="#inference-rules" id="inference-rules">Inference Rules</a></h2>
 <p><strong>Rules 1.5 (Type synthesis):</strong> \(\Gamma \vdash e \Rightarrow \tau\)</p>
 <p>\[\require{bussproofs}
@@ -811,15 +1147,15 @@ subsume normal arrow and (non-dependent) product kinds, giving us</p>
 for \(\Pi(\alpha:k).k'\) and \(\Sigma(\alpha:k).k'\) respectively if \(k\) is not
 free in \(k'\).</p>
 <p>The judgments we will use are</p>
-<table><thead><tr><th>Judgment</th><th>Meaning</th></tr></thead><tbody>
-<tr><td>\(\Gamma \vdash k:\text{kind}\)</td><td>Kind validity</td></tr>
-<tr><td>\(\Gamma \vdash k \equiv k' : \text{kind}\)</td><td>Kind equivalence</td></tr>
-<tr><td>\(\Gamma \vdash k \le k'\)</td><td>Subkinding</td></tr>
-<tr><td>\(\Gamma \vdash c: k\)</td><td>Kinding</td></tr>
-<tr><td>\(\Gamma \vdash c \equiv c' : k\)</td><td>Constructor equivalence</td></tr>
-<tr><td>\(\Gamma \vdash e : \tau\)</td><td>Typing (same as \(F_\omega\))</td></tr>
-<tr><td>\(\phantom{\Gamma} \vdash \Gamma\ ok\)</td><td>Context well-formedness</td></tr>
-</tbody></table>
+<p>| Judgment | Meaning |
+|---|---|
+| \(\Gamma \vdash k:\text{kind}\) | Kind validity |
+| \(\Gamma \vdash k \equiv k' : \text{kind}\) | Kind equivalence |
+| \(\Gamma \vdash k \le k'\) | Subkinding |
+| \(\Gamma \vdash c: k\) | Kinding |
+| \(\Gamma \vdash c \equiv c' : k\) | Constructor equivalence |
+| \(\Gamma \vdash e : \tau\) | Typing (same as \(F_\omega\)) |
+| \(\phantom{\Gamma} \vdash \Gamma\ ok\) | Context well-formedness |</p>
 <p>The addition of singleton kinds necessitates subkinding to handle cases like
 <code>int</code>, which has kind \(*\) but <em>also</em> kind \(S(\texttt{int})\).</p>
 <p><strong>Rules 2.1 (Kind validity):</strong> \(\Gamma \vdash k:\text{kind}\)</p>
@@ -1225,20 +1561,20 @@ make sense to me. Maybe I'll do the full proof out later.</li>
 judgements should look familiar (for ease of typesetting I'm choosing to use
 superscripts for modes instead of writing it on top of the character from here
 onwards).</p>
-<table><thead><tr><th>Judgment</th><th>Meaning</th></tr></thead><tbody>
-<tr><td>\(\Gamma^+ \vdash k^+ \Leftarrow \text{kind}\)</td><td>Kind validity</td></tr>
-<tr><td>\(\Gamma^+ \vdash k^+ \Leftrightarrow k'^+ : \text{kind}\)</td><td>Kind equivalence</td></tr>
-<tr><td>\(\Gamma^+ \vdash k^+ \unlhd k'^+\)</td><td>Subkinding</td></tr>
-<tr><td>\(\Gamma^+ \vdash c^+ \Rightarrow k^-\)</td><td>Kind synthesis</td></tr>
-<tr><td>\(\Gamma^+ \vdash c^+ \Leftarrow k^+\)</td><td>Kind checking</td></tr>
-<tr><td>\(\Gamma^+ \vdash c^+ \uparrow k^- \)</td><td>Natural kind</td></tr>
-<tr><td>\(\Gamma^+ \vdash c^+ \Leftrightarrow c'^+ : k^+\)</td><td>Algorithmic equivalence</td></tr>
-<tr><td>\(\Gamma^+ \vdash c^+ \leftrightarrow c'^+ : k^-\)</td><td>Structural path equivalence</td></tr>
-<tr><td>\(\Gamma^+ \vdash c^+ \rightsquigarrow c'^-\)</td><td>Weak-head reduction</td></tr>
-<tr><td>\(\Gamma^+ \vdash c^+ \Downarrow c'^-\)</td><td>Weak-head normalization</td></tr>
-<tr><td>\(\Gamma^+ \vdash e^+ \Rightarrow \tau^-\)</td><td>Type synthesis</td></tr>
-<tr><td>\(\Gamma^+ \vdash e^+ \Leftarrow \tau^+\)</td><td>Type checking</td></tr>
-</tbody></table>
+<p>| Judgment | Meaning |
+|---|---|
+| \(\Gamma^+ \vdash k^+ \Leftarrow \text{kind}\) | Kind validity |
+| \(\Gamma^+ \vdash k^+ \Leftrightarrow k'^+ : \text{kind}\) | Kind equivalence |
+| \(\Gamma^+ \vdash k^+ \unlhd k'^+\) | Subkinding |
+| \(\Gamma^+ \vdash c^+ \Rightarrow k^-\) | Kind synthesis |
+| \(\Gamma^+ \vdash c^+ \Leftarrow k^+\) | Kind checking |
+| \(\Gamma^+ \vdash c^+ \uparrow k^- \) | Natural kind |
+| \(\Gamma^+ \vdash c^+ \Leftrightarrow c'^+ : k^+\) | Algorithmic equivalence |
+| \(\Gamma^+ \vdash c^+ \leftrightarrow c'^+ : k^-\) | Structural path equivalence |
+| \(\Gamma^+ \vdash c^+ \rightsquigarrow c'^-\) | Weak-head reduction |
+| \(\Gamma^+ \vdash c^+ \Downarrow c'^-\) | Weak-head normalization |
+| \(\Gamma^+ \vdash e^+ \Rightarrow \tau^-\) | Type synthesis |
+| \(\Gamma^+ \vdash e^+ \Leftarrow \tau^+\) | Type checking |</p>
 <p>As our term and constructor language is entirely unchanged from \(F_\omega\), we
 can import the type checking/synthesis rules nearly wholesale. The only change
 is that we now need to check that the kind introduced by a \(\forall\) introduction
@@ -1551,6 +1887,327 @@ from \(F_\omega\):</p>
 here, particularly kind equivalence (which made the homework extra fun...).
 I have included those rules from
 Nick Roberts' notes for the sake of completeness.</li>
+</ul>
+<h1><a class="header" href="#binding" id="binding">Binding</a></h1>
+<p>Up to now, when writing rules &quot;on the whiteboard&quot;, we have been blase about our
+syntactic representation of variables and binding. In particular, all the rules
+given only make sense if we implicitly assume that all rules apply up to alpha
+equivalence, and that all substitutions are capture-avoiding. In doing so,
+however, we necessarily gloss over any details of what an actual program
+implementing these algorithms may need to ensure these invariants are upheld.</p>
+<p>We now give some discussion on how these may be implemented in an actual
+compiler. In the structural code for this class, we will use a hybrid of the
+techniques discussed here -- terms will use explicit variables and constructors
+will use De Bruijin indices. Past this explanation, we will continue to use the
+notation for explicit variables everywhere, which should be implicitly converted
+to De Bruijin where appropriate.</p>
+<h2><a class="header" href="#explicit-variables" id="explicit-variables">Explicit Variables</a></h2>
+<p>Consider (syntactically) the lambda calculus whose terms consist of variables,
+lambda abstractions, and applications. Variables and bindings are &quot;explicit&quot;,
+represented and differentiated with a literal string of characters (say \(x\)).
+This has the example of being extremely simple to read, and has comparatively
+few pitfalls to other approaches.</p>
+<p>What would a substitution function on these terms look like? Certainly,
+substituting into a variable or an application is easy. What about the lambda
+case?</p>
+<p>\[\require{bussproofs}
+\begin{aligned}[]
+[M/x]\lambda x.N &amp;= \lambda x.N \hfill&amp; \\
+[M/x]\lambda y.N &amp;= \lambda y.[M/x]N \hfill&amp; (y \not\in FV(M)) \\
+[M/x]\lambda y.N &amp;= \lambda y'.[M/x][y/y']N \hfill&amp; (y' \ne x, y \in FV(M),
+y' \not\in FV(M))
+\end{aligned}
+\]</p>
+<p>In the first case, we ignore the substitution -- the variable \(x\) is bound in
+the lambda, so any suboccurrences of \(x\) aren't free (and thus shouldn't be
+subbed). In the other two cases, we are forced to check whether \(y\) is free in
+the substitutee \(M\), traversing the entire term each time. Then, if it is free
+in \(M\), we <em>also</em> need to traverse the subterm \(N\) to alpha-vary it properly.</p>
+<p>This is, as you may have surmised, not an ideal state of affairs. One
+alternative is to just <em>always</em> alpha-vary the bound term, giving us the clause</p>
+<p>\[
+\begin{aligned}[]
+[M/x]\lambda y.N &amp;= \lambda y'.[M/x][y/y']N \hfill&amp; (x \ne y, y' \ne x, y' \ne FV(M))
+\end{aligned}
+\]</p>
+<p>where we generate a fresh variable each time. This is marginally better for
+simplicity, but now requires us to traverse the subterm \(N\) every time.</p>
+<h2><a class="header" href="#de-bruijin-indices" id="de-bruijin-indices">De Bruijin Indices</a></h2>
+<p>Clearly, we need a better way. Another alternative we can use is <em>De Bruijin
+indices</em>, in which a variable is represented by the number of binders between
+the variable itself and its introduction. So the term \(\lambda x.x\ (\lambda y.
+x\ y)\) would be written as \(\lambda . 0\ (\lambda. 1\ 0)\).</p>
+<p>Related is the idea of De Bruijin <em>levels</em>, which count the indices backwards,
+from the <em>outermost</em> binder. However, these are unwieldy and nobody uses them,
+so we won't either.</p>
+<p>Our substitution function, then, will look like this (remember that \(i\) and \(j\)
+are <em>natural numbers</em> here):</p>
+<p>\[
+\begin{aligned}[]
+[M/i]i &amp;= M \\
+[M/i]j &amp;= j-1 \hfill&amp; (j &gt; i) \\
+[M/i]j &amp;= j   \hfill&amp; (j \lt i) \\
+[M/i](N_1\ N_2) &amp;= [M/i]N_1\ ([M/i]N_2) \\
+[M/i]\lambda.N &amp;= \lambda.[M\uparrow^1_0/i+1]N
+\end{aligned}
+\]</p>
+<p>where \(\uparrow\) is an operation that shifts the variables in a subterm (to be
+defined). If \(j \lt i\), on the other hand, we can leave it be, as there isn't
+an intermediate binding that has been removed.</p>
+<p>In the \(j &gt; i\) case, we need to lower the variable by 1, because if we're
+substituting for it, it means we've removed a binding site (namely, the binding
+\(i\)).</p>
+<p>When going underneath a binder (in the \(\lambda\)-abstraction case), we need to
+adjust any variables in the substitutee \(M\) to account for the extra binder --
+if \(M\) refers to some free variable at index \(0\), then that needs to become
+index \(1\) once we go underneath the lambda binder. This is where the \(\uparrow\)
+operation comes in:</p>
+<p>\[
+\begin{aligned}[]
+i \uparrow^j_k &amp;= i + j \hfill&amp; (i \ge k) \\
+i \uparrow^j_k &amp;= i \hfill&amp; (\text{otherwise}) \\
+(M\ N) \uparrow^j_k &amp;= (M \uparrow^j_k)\ (N \uparrow^j_k) \\
+(\lambda.M) \uparrow^j_k &amp;= \lambda.(M \uparrow^j_{k+1})
+\end{aligned}
+\]</p>
+<p>Let's try this on some concrete examples. Consider the eta rule for \(\Pi\)-kinds:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma, \alpha:k_1 \vdash c\ \alpha:k_2$}
+\UnaryInfC{$\Gamma \vdash c : \Pi(\alpha:k_1).k_2$}
+\end{prooftree}
+\]</p>
+<p>Under De Bruijin, this becomes</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma, k_1 \vdash c\uparrow^1_0\ 0 : k_2$}
+\UnaryInfC{$\Gamma \vdash c : \Pi(k_1).k_2$}
+\end{prooftree}
+\]</p>
+<p>In the premise, we need to upshift any variables in the constructor \(c\), because
+we're adding a new variable (namely, \(\alpha\)) without going underneath an
+explicit binding site.</p>
+<p>What about application?</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:\Pi(\alpha:k_1).k_2$}
+\AxiomC{$\Gamma \vdash c':k_1$}
+\BinaryInfC{$\Gamma \vdash c\ c' : [c'/\alpha]k_2$}
+\end{prooftree}
+\]</p>
+<p>This becomes</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:\Pi(k_1).k_2$}
+\AxiomC{$\Gamma \vdash c':k_1$}
+\BinaryInfC{$\Gamma \vdash c\ c' : [c'/0]k_2$}
+\end{prooftree}
+\]</p>
+<p>Here, because of how we defined substitution, we can avoid needing to do the
+explicit downshift that comes from instantiating the \(\alpha\) binding.</p>
+<h2><a class="header" href="#explicit-substitutions" id="explicit-substitutions">Explicit substitutions</a></h2>
+<p>When working with such a representation, it can often be extremely unwieldy to
+need to use the above definition for every substitution. Instead, we can use a
+compositional representation acting on terms. Let \(\sigma\) be the syntactic
+class of substitutions, which are, spiritually, functions from term to term,
+applied as \(M[\sigma]\) (the reverse of the usual notation). Some presentations
+of this system may even add \(M[\sigma]\) to the grammar as a term itself (called
+a &quot;closure&quot;, confusingly), but we will not, for simplicit. We have</p>
+<p>\[
+\begin{aligned}
+\sigma &amp;:= \uparrow^i \mid M.\sigma \\
+\end{aligned}
+\]</p>
+<p>where \(M.\sigma\) is the substitution replacing variable \(0\) with \(M\) and
+performing \(\sigma\) to \(i-1\) for each other variable \(i\). We will also define
+the substitution \(id\) to be \(\uparrow^0\).</p>
+<p>The substitution \([M_0/0, M_1/1, M_2/2]\), then, will be represented by the
+operation \(M_0.M_1.M_2.id\).</p>
+<p>With substitutions now represented as first-class, it makes sense to define the
+composition of substitutions. Namely, we want \(\sigma \circ \sigma'\) to be
+the transformation such that \(M[\sigma \circ \sigma'] = (M[\sigma])[\sigma']\).</p>
+<p>Our application rules become:</p>
+<p>\[\begin{aligned}
+0[M.\sigma] &amp;= M \\
+i+1[M.\sigma] &amp;= i[\sigma] \\
+i [\uparrow^j] &amp;= i+j \\
+(N\ P)[\sigma] &amp;= (N[\sigma]\ P[\sigma]) \\
+(\lambda.M)[\sigma] &amp;= \lambda.(M[0.(\sigma \circ \uparrow^1)])
+\end{aligned}
+\]</p>
+<p>with composition defined as</p>
+<p>\[\begin{aligned}
+(M.\sigma) \circ \sigma' &amp;= (M[\sigma']) . (\sigma \circ \sigma') \\
+\uparrow^i \circ \uparrow^j &amp;= \uparrow^{i+j} \\
+id \circ M.\sigma &amp;= M.\sigma \\
+\uparrow^{i+1} \circ M.\sigma &amp;= \uparrow^i \circ \sigma
+\end{aligned}
+\]</p>
+<p>Suppose, then, that we wanted to apply an operation \(\sigma\) to the second
+variable in our binding list. To do that with what we have, we'd need to leave
+all \(0\)s and \(1\)s untouched. We can do that with</p>
+<p>\[
+\sigma \rightsquigarrow 0.(\sigma \circ \uparrow) \rightsquigarrow
+0.((0.(\sigma \circ \uparrow)) \circ \uparrow)
+\]</p>
+<p>where \(\rightsquigarrow\) is a transformation shifting a substitution to act
+under one binding, and the last term is equal to</p>
+<p>\[
+0.(0[\uparrow].(\sigma \circ \uparrow) \circ \uparrow) =
+0.1.(\sigma \circ \uparrow^2)
+\]</p>
+<p>This suggests a pattern:</p>
+<p>\[
+under_i(\sigma) = 0.1.\dots.i-1.\sigma \circ \uparrow^i
+\]</p>
+<p>which is to apply the operation \(\sigma\) under \(i\) bindings.</p>
+<p>A typical use case may look like</p>
+<p>\[
+0.1.\dots.i-1.M_1[\uparrow^i].\dots.M_j[\uparrow^i].\uparrow^{i+k}
+\]</p>
+<p>In the starter code, this pattern is implemented for us as the function</p>
+<pre><code class="language-ocaml">subst_term : nat -&gt; term list -&gt; nat -&gt; subst
+</code></pre>
+<h2><a class="header" href="#remarks-3" id="remarks-3">Remarks</a></h2>
+<ul>
+<li>I always find it simplest to think of the variable \(0\) as being an index into
+the ordered context list. In this way, any time something is added to the
+context <em>without</em> an explicit binder, it makes sense to increment the
+internal vars.</li>
+</ul>
+<h1><a class="header" href="#continuation-passing-style" id="continuation-passing-style">Continuation Passing Style</a></h1>
+<p>The next language we'll be covering is <code>IL-CPS</code>, whose purpose is to make
+control flow explicit in the syntax of the language.</p>
+<p>In particular, this language will have the following three properties:</p>
+<ol>
+<li>No implicit control flow -- procedure calls, returns, exceptions, etc. are
+all represented as jumps.</li>
+<li>All intermediate values are named.</li>
+<li>Continuations are reified as 1st class values.</li>
+</ol>
+<p>To explain the second condition, instead of compound expressions like <code>x+y+z</code>,
+in CPS form we would use something akin to <code>let x' = x+y in x'+z</code>.</p>
+<p>There are some compilers whose CPS transformation pass only conforms to the
+first two conditions. This is known as &quot;A-normal form&quot;, or &quot;monadic form&quot;. Or,
+very creatively, &quot;2/3rds CPS&quot;.</p>
+<h1><a class="header" href="#type-directed-translation" id="type-directed-translation">Type-directed Translation</a></h1>
+<p>As usual, before we get into a full discussion of CPS, we'll need to develop
+some more machinery.</p>
+<p>Usually, language translations are &quot;syntax-directed&quot;, a translation judgment
+defined inductively over the syntax tree. Between two types of lambda calculi,
+for example, we might define our translation like this:</p>
+<p>\[\require{bussproofs}
+\begin{aligned}
+\overline{x} &amp;= x \\
+\overline{\lambda (x:\tau).e} &amp;= \lambda(x:\overline{\tau}).\overline{e} \\
+\overline{e_1\ e_2} &amp;= \overline{e_1}\ \overline{e_2}
+\end{aligned}
+\]</p>
+<p>where the the translation can be determined solely by looking at the particular
+syntactic form.</p>
+<p>One problem: This doesn't always work.</p>
+<p>For example, consider translating a language with booleans into System
+\(F_\omega\). Under a standard Church encoding, we'd translate the type <code>bool</code> as</p>
+<p>\[
+\overline{bool} = \forall(\alpha:*).(\alpha \rightarrow \alpha \rightarrow \alpha)
+\]</p>
+<p>with the corresponding introduction forms</p>
+<p>\[
+\begin{aligned}
+\overline{true} &amp;= \Lambda \alpha.\lambda(x:\alpha).\lambda(y:\alpha).x \\
+\overline{false} &amp;= \Lambda \alpha.\lambda(x:\alpha).\lambda(y:\alpha).y \\
+\end{aligned}
+\]</p>
+<p>A problem, however, comes when trying to translate the elimination form:</p>
+<p>\[
+\overline{if\ e_1\ then\ e_2\ else\ e_3} = \overline{e_1}[\tau]\ \overline{e_2}
+\ \overline{e_3}
+\]</p>
+<p>What type should we use for \(\tau\)? It should be the type of \(e_1\) and \(e_2\),
+but without actually running a typechecker, we won't know what type that is! To
+deal with this, we can use a <em>type-directed</em> translation, which couples the
+translation step with the typechecking/type synthesis process.</p>
+<p>Of course, there are really <em>two</em> typing judgments here, one for the source and
+one for the target language. These are usually notated</p>
+<p>\[
+\begin{aligned}
+\Gamma \vdash_S e:\tau \\
+\Gamma \vdash_T e:\tau
+\end{aligned}
+\]</p>
+<p>for <strong>s</strong>ource and <strong>t</strong>arget, respectively. However, we will elide the
+subscripts in cases where the context makes it clear, typically when we know
+what language the given term is in.</p>
+<p>Our translation judgment, then, becomes</p>
+<p>\[\Gamma \vdash_S e:\tau \rightsquigarrow e'\]</p>
+<p>where \(e\) is in the source and \(e'\) is in the target language.</p>
+<p>Note that we can actually use a syntax-directed translation of constructors,
+kinds and contexts. For a more complex constructor language, we may need to
+perform a <em>kind</em>-directed translation, but thankfully that is not the case here.</p>
+<p>A translation, then, should have the following regularity conditions:</p>
+<ol>
+<li>\(\Gamma \vdash_S \tau: *\) if and only if \(\overline{\Gamma} \vdash_T
+\overline{\tau}: *\).</li>
+<li>\(\Gamma \vdash_S e:\tau\) if and only if there exists some \(e'\) such that
+\(\Gamma \vdash_S e:\tau \rightsquigarrow e'\).</li>
+<li>If \(\Gamma \vdash_S e:\tau \rightsquigarrow e'\), then \(\overline{\Gamma}
+\vdash_T e':\overline{\tau}\) (static correctness).</li>
+</ol>
+<p>You might think that, since we have a notion of static correctness, we may also
+have some form of <em>dynamic</em> correctness to preserve. Loosely, this might be
+phrased as &quot;If \(\Gamma \vdash e:\tau \rightsquigarrow e'\), then \(e\) and \(e'\)
+'do the same thing'&quot;. However, it is actually quite difficult to even state
+this formally! Certainly, we can't state this without having some formal notion
+of dynamic behavior, which we won't be dealing with in this class. It turns out
+that these proofs are also quite involved, which is another reason we don't
+bother.</p>
+<p>A type-directed translation rule will always follow the same form of the
+associated regular typing rule, where the premises are also a translation. The
+variable translation rule, for example might look like this:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma(x) = \tau$}
+\UnaryInfC{$\Gamma \vdash x:\tau \rightsquigarrow x$}
+\end{prooftree}
+\]</p>
+<p>In general, it is best not to touch variable names. If we do start messing with
+variable names, we'll need to ensure freshness, perform substitutions on
+subterms, and so on -- not worth it at all.</p>
+<p>Returning to the if-then-else example, we can now express the correct
+translation (assuming the usual rule for typing if-then-else):</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:bool \rightsquigarrow e_1'$}
+\AxiomC{$\Gamma \vdash e_2:\tau \rightsquigarrow e_2'$}
+\AxiomC{$\Gamma \vdash e_3:\tau \rightsquigarrow e_3'$}
+\TrinaryInfC{$\Gamma \vdash if\ e_1\ then\ e_2\ else\ e_3:\tau
+\rightsquigarrow e_1'[\overline{\tau}]\ e_2'\ e_3'$}
+\end{prooftree}
+\]</p>
+<p>Finally, note that these rules will need to be adjusted somewhat to work with
+the algorithmic type synthesis and type checking rules.</p>
+<p>Although we have not given a full formal system, we can sketch out what a proof
+of the regularity conditions may look like:</p>
+<ol>
+<li>Depends on the specifics of the kind system, but often follows via
+induction on the kinding judgment (in both directions).</li>
+<li>The forward direction is fairly clear, as we design our rules to follow
+from the source typing judgment. The backwards direction is even easier,
+as we can simply delete the translations from every premise and conclusion
+to show what we need.</li>
+<li>Was not given in lecture; can be proven relatively easily for yourself.</li>
+</ol>
+<h2><a class="header" href="#remarks-4" id="remarks-4">Remarks</a></h2>
+<ul>
+<li>In lecture, Prof. Crary chose to use \(\overline{e}\) as the &quot;output&quot; of the
+translation judgment, where \(\overline{\cdot}\) here is not acting as an
+operator, just taking the symbol \(\overline{e}\) as a suggestive variable
+name. I have taken the liberty of rephrasing the rules to use something
+else for the sake of my own confusion.</li>
+<li>I did a few cases of the proof of the translation from IL-Direct to IL-CPS
+and it seems to be fairly trivial. The third condition can be shown by
+induction over the translation rules, but is muddied by the presence of
+different syntactic classes.</li>
 </ul>
 
                     </main>
