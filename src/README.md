@@ -19,6 +19,9 @@ I will do my best to keep my personal comments restricted to the remarks. Any
 mistakes are mine. These notes will include no more SML code than was presented
 in lecture.
 
+This document is intended to be read as an `mdbook`, which, at the time of this
+writing, can be viewed [here](https://hotc.camdar.io/).
+
 [source](https://github.com/CT075/hotc)
 
 ## Structure of the Compiler

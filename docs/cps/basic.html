@@ -1,0 +1,392 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Introduction to CPS - Higher-Order Typed Compilation</title>
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="A transcription of my lecture notes from 15-417">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+        <!-- MathJax -->
+        <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="../binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="../cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="../cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li><li class="expanded "><a href="../cps/basic.html" class="active"><strong aria-hidden="true">4.2.</strong> Introduction to CPS</a></li><li class="expanded "><a href="../cps/direct.html"><strong aria-hidden="true">4.3.</strong> Call by Value CPS</a></li><li class="expanded "><a href="../cps/cbncallcc.html"><strong aria-hidden="true">4.4.</strong> Other evaluation strategies</a></li><li class="expanded "><a href="../cps/exceptions.html"><strong aria-hidden="true">4.5.</strong> Exceptions</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">Higher-Order Typed Compilation</h1>
+
+                        <div class="right-buttons">
+                            <a href="../print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#introduction-to-continuation-passing-style" id="introduction-to-continuation-passing-style">Introduction to Continuation Passing Style</a></h1>
+<p>Before we can discuss the translation, we must specify our source and target
+languages.</p>
+<h2><a class="header" href="#source-il-direct" id="source-il-direct">Source: IL-Direct</a></h2>
+<table><thead><tr><th>Sort</th><th></th><th></th></tr></thead><tbody>
+<tr><td>Kinds</td><td>\(k:=\)</td><td>\(* \mid S(c) \mid \Pi(\alpha:k).k \mid \Sigma(\alpha:k).k\)</td></tr>
+<tr><td>Tycons</td><td>\(c:=\)</td><td>\(\alpha \mid \lambda(\alpha:k).c \mid c\ c \mid \langle c, c\rangle \mid \pi_1c \mid \pi_2c\)</td></tr>
+<tr><td>(Types)</td><td>\((\tau)\)</td><td>\(\phantom{\alpha} \mid \forall(\alpha:k).\tau \mid \tau \rightarrow \tau \mid \tau \times \tau\)</td></tr>
+<tr><td>Terms</td><td>\(e:=\)</td><td>\(x \mid \Lambda(\alpha:k).e \mid e[c] \mid \lambda(x:\tau).e \mid e\ e\)</td></tr>
+<tr><td></td><td></td><td>\(\phantom{x} \mid \langle e, e \rangle \mid \pi_1e \mid \pi_2e\)</td></tr>
+</tbody></table>
+<p>For the most part, the kinds and the non-\(\tau\) type constructors will be the
+same for the rest of the class. The <em>types</em>, on the other hand, will be changing
+quite frequently, as will the terms (obviously). In a real implementation, we'll
+also be adding some <em>actual</em> base types, like <code>int</code>, <code>bool</code>, <code>exn</code>, <code>ref</code>, etc.</p>
+<h2><a class="header" href="#target-il-cps" id="target-il-cps">Target: IL-CPS</a></h2>
+<table><thead><tr><th>Sort</th><th></th><th></th></tr></thead><tbody>
+<tr><td>Kinds</td><td>\(k:=\)</td><td>same</td></tr>
+<tr><td>Tycons</td><td>\(c:=\)</td><td>same</td></tr>
+<tr><td>(Types)</td><td>\((\tau)\)</td><td>\(\dots \mid \exists(\alpha:k).\tau \mid \neg\tau \mid \tau \times \tau\)</td></tr>
+<tr><td>Values</td><td>\(v:=\)</td><td>\(x \mid \lambda(x:\tau).e \mid \langle v, v \rangle \mid pack\ [c,v]\ as\ \exists(\alpha:k).\tau\)</td></tr>
+<tr><td>Expressions</td><td>\(e:=\)</td><td>\(let\ x=v\ in\ e \mid v\ v \mid let\ x = \pi_1v\ in\ e \mid let\ x = \pi_2v\ in\ e\)</td></tr>
+<tr><td></td><td></td><td>\(\phantom{x} \mid unpack\ [\alpha,x] = v\ in\ e \mid halt\)</td></tr>
+</tbody></table>
+<p>Properly, we might notate \(\neg\tau\) as \(\tau \rightarrow answer\) or \(\tau
+\rightarrow 0\), to notate that lambdas (really, continuations) don't return.
+However, by marking it as \(\neg\tau\), some of the type relationships become more
+obvious. Similarly, the \(v\ v\) syntactic form is more of a jump than a function
+call.</p>
+<p>If we had booleans (particularly if-then-else), we might add \(if\ v\ then\ e\ else\ e\)
+for this. Instead of nesting expressions, we need to <em>bind</em> them into values
+before they can be used. For this reason, this is a &quot;monadic form&quot;.</p>
+<h2><a class="header" href="#basic-principles" id="basic-principles">Basic Principles</a></h2>
+<p>When translating kinds and contexts, we can largely do the obvious thing. With
+types, on the other hand, we have some work to do. We have</p>
+<p>\[\require{bussproofs}\overline{\tau_1 \rightarrow \tau_2} = \neg(\overline{\tau_1} \times \neg
+\overline{\tau_2})\]</p>
+<p>Intuitively, we can think of a function, in CPS, as a jump taking the standard
+parameter (\(\overline{\tau_1}\)) and also a continuation argument telling where
+to jump with the result (\(\neg\overline{\tau_2}\)). In the theory, the slick way
+to see it is that \(A \implies B\) is equivalent to \(\neg A \lor B\), which is
+in turn equivalent to \(\neg (A \land \neg B)\) by De Morgan's law. It turns out
+that programming in the presence of continuations actually encodes <em>classical</em>
+logic under Curry-Howard, where the proof of a proposition \(\tau\) can be
+contradicted with (thrown to) a <em>continuation</em> \(\neg \tau\), which diverges
+(produces \(\bot\)). Classical and constructive logic coincide on \(\Pi_2\)
+sentences, which are sentences of the form \(\forall \dots \forall . \exists
+\dots \exists . p\) (either of the quantifier prefix lists can be empty), where
+\(p\) is a decidable proposition.</p>
+<p>By Curry-Howard, the translation \(M:A \rightsquigarrow \overline{M}:
+\overline{A}\) transforms the proof \(M\) to remove uses of double negation
+elimination (known in PL parlance as <code>callcc</code>). If \(A\) is \(\Pi_2\), we can
+extract a proof of \(A\) from a proof of \(\overline{A}\) in this way.</p>
+<p>You may also notice that IL-CPS does not have \(\forall\) types, only \(\exists\).
+We use the translation</p>
+<p>\[\overline{\forall(\alpha:k).\tau} = \neg(\exists(\alpha:\overline{k}).\neg
+\overline{\tau})\]</p>
+<p>again using the classical tautology \(\forall x.p \Leftrightarrow \neg \exists
+x. (\neg p)\). Computationally, this transforms a <em>function</em> taking the
+constructor \(\alpha\) and returning a value into a continuation that takes an
+<em>existential</em> holding \(\alpha\) and an internal continuation taking the resulting
+\(\tau\) value. We don't actually want to have \(\forall(\alpha:k).\tau\) as a
+type in our CPS language. It is workable, but very strange -- some function
+calls become <em>values</em>, and so on. Doing this actually produces better code at
+the expense of some unfortunate semantics (for example, the value restriction
+resurfaces).</p>
+<p>Some regularity conditions:</p>
+<ol>
+<li>If \(\Gamma \vdash k:\text{kind}\), then \(\overline{\Gamma} \vdash \overline{k}
+:\text{kind}\)</li>
+<li>If \(\Gamma \vdash c:k\), then \(\overline{\Gamma} \vdash \overline{c}:\overline{k}\)</li>
+</ol>
+<p>A third property that's nice to have is that the translation commutes with
+substitution:</p>
+<p>\[\overline{[c_1/\alpha]c_2} = [\overline{c_1}/\alpha]\overline{c_2}\]</p>
+<p>which holds if we don't mess with the variables.</p>
+<p>The translation judgment itself will need to be a little weird to accommodate
+the CPS property. Instead of using the typical \(\Gamma \vdash e:\tau \rightsquigarrow
+e'\), we're going to bind an explicit continuation argument \(\Gamma \vdash
+e:\tau \rightsquigarrow x.e'\), where \(x\) is a bound continuation of type \(\neg
+\overline\tau\). We can think of this translation as assuming a continuation
+to pass the &quot;result&quot; of evaluating the expression \(e\) to.</p>
+<p>Properly, of course, continuation arguments are named \(k\) by convention. We
+already use \(k\) for kinds, but the two appear in different contexts, so there's
+no possibility of confusion.</p>
+<h2><a class="header" href="#statics-of-il-cps" id="statics-of-il-cps">Statics of IL-CPS</a></h2>
+<p>Because of the value-expression modality, we need to adjust our definition of
+static correctness:</p>
+<ul>
+<li>If \(\Gamma \vdash e:\tau \rightsquigarrow k.e'\) and \(\vdash \Gamma\ ok\), then
+\(\overline{\Gamma}, k:\neg \overline{\tau} \vdash e':0\)</li>
+</ul>
+<p>The \(0\) in this expression typing judgment denotes that, in this language,
+expressions diverge -- they have type <code>void</code>, effectively. Values, of course,
+are typed as usual.</p>
+<p>IL-CPS, then, is defined statically as follows:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma(x) = \tau$}
+\UnaryInfC{$\Gamma \vdash x:\tau$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \tau:*$}
+\AxiomC{$\Gamma, x:\tau \vdash e:0$}
+\BinaryInfC{$\Gamma \vdash \lambda(x:\tau).e : \neg \tau$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash v_1:\tau_1$}
+\AxiomC{$\Gamma \vdash v_2:\tau_2$}
+\BinaryInfC{$\Gamma \vdash \langle v_1, v_2 \rangle : \tau_1 \times \tau_2$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:k$}
+\AxiomC{$\Gamma \vdash v:[c/\alpha]\tau$}
+\AxiomC{$\Gamma, \alpha:k \vdash \tau:*$}
+\TrinaryInfC{$\Gamma \vdash pack\ [c,v]\ in\ \exists(\alpha:k).\tau$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash v_1:\neg \tau$}
+\AxiomC{$\Gamma \vdash v_2:\tau$}
+\BinaryInfC{$\Gamma \vdash v_1\ v_2:0$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash v:\tau$}
+\AxiomC{$\Gamma, x:\tau \vdash e:0$}
+\BinaryInfC{$\Gamma \vdash let\ x=v\ in\ e:0$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash x:\tau_1 \times \tau_2$}
+\AxiomC{$\Gamma, x:\tau_1 \vdash e:0$}
+\BinaryInfC{$\Gamma \vdash let\ x=\pi_1v\ in\ e:0$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash x:\tau_1 \times \tau_2$}
+\AxiomC{$\Gamma, x:\tau_2 \vdash e:0$}
+\BinaryInfC{$\Gamma \vdash let\ x=\pi_2v\ in\ e:0$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash v:\exists(\alpha:k).\tau$}
+\AxiomC{$\Gamma,\alpha:k,x:\tau \vdash e:0$}
+\BinaryInfC{$\Gamma \vdash unpack\ [\alpha,x]=v\ in\ e:0$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{}
+\UnaryInfC{$\Gamma \vdash halt:0$}
+\end{prooftree}
+\]</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../cps/tdt.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../cps/direct.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="../cps/tdt.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="../cps/direct.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3001");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

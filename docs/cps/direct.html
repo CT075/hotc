@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Review: System F - Higher-Order Typed Compilation</title>
+        <title>Call by Value CPS - Higher-Order Typed Compilation</title>
         
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html" class="active"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="../binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="../cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="../cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li><li class="expanded "><a href="../cps/basic.html"><strong aria-hidden="true">4.2.</strong> Introduction to CPS</a></li><li class="expanded "><a href="../cps/direct.html"><strong aria-hidden="true">4.3.</strong> Call by Value CPS</a></li><li class="expanded "><a href="../cps/cbncallcc.html"><strong aria-hidden="true">4.4.</strong> Other evaluation strategies</a></li><li class="expanded "><a href="../cps/exceptions.html"><strong aria-hidden="true">4.5.</strong> Exceptions</a></li></ol></li></ol>
+                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="../binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="../cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="../cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li><li class="expanded "><a href="../cps/basic.html"><strong aria-hidden="true">4.2.</strong> Introduction to CPS</a></li><li class="expanded "><a href="../cps/direct.html" class="active"><strong aria-hidden="true">4.3.</strong> Call by Value CPS</a></li><li class="expanded "><a href="../cps/cbncallcc.html"><strong aria-hidden="true">4.4.</strong> Other evaluation strategies</a></li><li class="expanded "><a href="../cps/exceptions.html"><strong aria-hidden="true">4.5.</strong> Exceptions</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -151,75 +151,142 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#system-f" id="system-f">System F</a></h1>
-<p>As a warmup to \(F_\omega\), a brief review of the rules for
-System F.</p>
+                        <h1><a class="header" href="#basic-translation" id="basic-translation">Basic Translation</a></h1>
+<p>Our initial discussion of CPS transformation centers around &quot;direct-style&quot; code,
+which features no abnormal control flow operators (exceptions, continuations,
+etc).</p>
+<p>We discussed this a bit briefly in the last section, but here are the collected
+type translation rules for IL-CPS:</p>
 <p>\[\require{bussproofs}
 \begin{aligned}
-\tau &amp;:= \alpha \mid \tau \rightarrow \tau \mid \forall \alpha . \tau \\
-e &amp;:= x \mid \lambda (x:\tau).e \mid e\ e \mid \Lambda \alpha.e \mid e[\tau]
+\overline{\alpha} &amp;= \alpha \\
+\overline{\tau_1 \times \tau_2} &amp;= \neg(\overline{\tau_1} \times \overline{\tau_2}) \\
+\overline{\tau_1 \rightarrow \tau_2} &amp;= \neg(\overline{\tau_1} \times \neg
+\overline{\tau_2}) \\
+\overline{\forall(\alpha:k).\tau} &amp;= \neg(\exists(\alpha:\overline{k}).
+\neg\overline{\tau})
 \end{aligned}
 \]</p>
-<p>When typechecking System F, we use two judgments, \(\Gamma \vdash x:
-\tau\) and \(\Gamma \vdash \tau:*\)<sup class="footnote-reference"><a href="#1">1</a></sup>. The latter is often written
-\(\Gamma \vdash \tau\ type\), but we will use this notation so it becomes
-familiar for the future.</p>
-<p>\[
-\begin{prooftree}
-\AxiomC{$\Gamma(\alpha)= * $}
-\UnaryInfC{$\Gamma \vdash \alpha: * $}
-\end{prooftree}\qquad
-\begin{prooftree}
-\AxiomC{$\Gamma \vdash \tau_1: * $}
-\AxiomC{$\Gamma \vdash \tau_2: * $}
-\BinaryInfC{$\Gamma \vdash \tau_1 \rightarrow \tau_2: * $}
-\end{prooftree}\qquad
-\begin{prooftree}
-\AxiomC{$\Gamma, \alpha:* \vdash \tau : *$}
-\UnaryInfC{$\Gamma \vdash \forall \alpha.\tau : *$}
-\end{prooftree}
-\]</p>
+<p><strong>Rules 3.1 (CPS-conversion):</strong> \(\Gamma \vdash e:\tau \rightsquigarrow k.e'\)</p>
 <p>\[
 \begin{prooftree}
 \AxiomC{$\Gamma(x) = \tau$}
-\UnaryInfC{$\Gamma \vdash x : \tau$}
-\end{prooftree}\qquad
+\UnaryInfC{$\Gamma \vdash x:\tau \rightsquigarrow k.k\ x$}
+\end{prooftree}
+\]
+\[
 \begin{prooftree}
-\AxiomC{$\Gamma, x:\tau_1 \vdash e:\tau_2$}
-\UnaryInfC{$\Gamma \vdash \lambda (x:\tau_1) . e : \tau_1 \rightarrow \tau_2$}
-\end{prooftree}\qquad
+\AxiomC{$\Gamma \vdash e_1:\tau_1 \rightsquigarrow k_1.e_1'$}
+\AxiomC{$\Gamma \vdash e_2:\tau_2 \rightsquigarrow k_2.e_2'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash \langle e_1, e_2 \rangle :\tau_1 \times \tau_2 \rightsquigarrow k.&amp;
+let\ k_1= \lambda(x_1:\overline{\tau_1}).\\
+&amp;\quad (let\ k_2=\lambda(x_2:\overline{\tau_2}).k \langle x_1, x_2 \rangle
+\ in\ e_2') \\
+&amp;in\ e_1'
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
 \begin{prooftree}
-\AxiomC{$\Gamma, \alpha:* \vdash e:\tau$}
-\UnaryInfC{$\Gamma \vdash \Lambda \alpha. e : \forall \alpha . \tau$}
+\AxiomC{$\Gamma \vdash e : \tau_1 \times \tau_2 \rightsquigarrow k.e'$}
+\UnaryInfC{$
+\begin{aligned}
+\Gamma \vdash \pi_ie : \tau_i \rightsquigarrow k'.&amp;
+let\ k=\lambda(x:\overline{\tau_1} \times \overline{\tau_2}). \\
+&amp;\quad (let\ y = \pi_ix\ in\ k'\ y) \\
+&amp;in\ e'
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \tau:*$}
+\AxiomC{$\Gamma, x:\tau \vdash e:\tau' \rightsquigarrow k.e'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash \lambda(x:\tau).e: \tau \rightarrow \tau' \rightsquigarrow k'.
+&amp;k' (\lambda(y:\overline{\tau} \times \neg\overline{\tau'}). \\
+&amp;\qquad let\ x=\pi_1y\ in \\
+&amp;\qquad let\ k=\pi_2y\ in\ e')
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:\tau_1 \rightarrow \tau_2 \rightsquigarrow
+k_1.e_1'$}
+\AxiomC{$\Gamma \vdash e_2:\tau_1 \rightsquigarrow k_2.e_2'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash e_1\ e_2:\tau' \rightsquigarrow k.&amp;let\ k_1 =
+\lambda(x_1:\neg(\overline{\tau_1}\times \neg\overline{\tau_2})). \\
+&amp;\quad (let\ k_2 = \lambda(x_2:\tau_1).x_1\langle x_2,k \rangle\ in\ e_2') \\
+&amp;in\ e_1'
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k: \text{kind}$}
+\AxiomC{$\Gamma, \alpha:k \vdash \tau:*$}
+\AxiomC{$\Gamma, \alpha:k \vdash e:\tau \rightsquigarrow k.e'$}
+\TrinaryInfC{$
+\begin{aligned}
+\Gamma \vdash \Lambda(\alpha:k).e : \forall(\alpha:k).\tau \rightsquigarrow k'.
+&amp;k'( \lambda(y:\exists(\alpha:\overline{k}).\neg \overline{\tau}).\\
+&amp;\quad unpack [\alpha,k] = y\ in\ e')
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e:\forall(\alpha:k).\tau \rightsquigarrow k.e'$}
+\AxiomC{$\Gamma \vdash c:k$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash e[c]:[c/\alpha]\tau \rightsquigarrow k'.&amp;
+let\ k=\lambda(f:\neg(\exists(\alpha:\overline{k}).\neg\overline{\tau})). \\
+&amp;\quad f(pack\ [\overline{c},k']\ as\ \exists(\alpha:\overline{k}).
+\neg \overline{\tau}) \\
+&amp;in\ e'
+\end{aligned}
+$}
 \end{prooftree}
 \]</p>
-<p>The defining feature of System F is the \(\Lambda \alpha.e\) syntax form, with
-its corresponding \(\forall \alpha.e\) type, the so-called &quot;type-lambdas&quot; or
-&quot;polymorphic values&quot;. Just as value lambdas annotate their argument, we may
-also choose to do so with type lambdas, as \(\Lambda (\alpha : *).e\). Then the
-rule for typing big lambda expressions becomes</p>
-<p>\[
-\begin{prooftree}
-\AxiomC{$\Gamma, \alpha:* \vdash e:\tau$}
-\UnaryInfC{$\Gamma \vdash \Lambda (\alpha:*). e : \forall \alpha . \tau$}
-\end{prooftree}
-\]</p>
-<div class="footnote-definition" id="1"><sup class="footnote-definition-label">1</sup>
-<p>The kind of base types is officially \(T\) for \(type\), but I'm going to follow the Haskell convention of writing it as \(*\).</p>
-</div>
+<p>The important thing to keep in mind while devising these rules is that, when we
+recursively translate a
+sub-expression \(e\), we are given some bound term \(k.e'\), in which the bound \(k\)
+is a continuation taking the &quot;result&quot; of \(e'\) as input. When we <em>use</em> this
+result, then, \(k\) is <em>free</em>! To complete the translation, then, we have to
+re-bind \(k\) to be a continuation of the correct type
+(particularly, \(k\) has type \(\neg \overline\tau\) if \(e\) has type \(\tau\)).</p>
+<h2><a class="header" href="#remarks" id="remarks">Remarks</a></h2>
+<ul>
+<li>I personally found it easier to chase types rather than try to reason through
+the control flow. The two main patterns I used for intuition are that
+\(let\ k=\dots\ in\ e\) is the translation of &quot;evaluate \(e \rightsquigarrow
+k.e\)&quot; and \(k\ v\) is the translation of &quot;\(v\) is a value&quot;.</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="../fw/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../cps/basic.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="../fw/declarative.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="../cps/cbncallcc.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -231,13 +298,13 @@ rule for typing big lambda expressions becomes</p>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a href="../fw/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a href="../cps/basic.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a href="../fw/declarative.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a href="../cps/cbncallcc.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 

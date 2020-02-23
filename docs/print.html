@@ -86,7 +86,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="index.html">Intro</a></li><li class="expanded "><a href="fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li></ol></li></ol>
+                <ol class="chapter"><li class="expanded affix "><a href="index.html">Intro</a></li><li class="expanded "><a href="fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li><li class="expanded "><a href="cps/basic.html"><strong aria-hidden="true">4.2.</strong> Introduction to CPS</a></li><li class="expanded "><a href="cps/direct.html"><strong aria-hidden="true">4.3.</strong> Call by Value CPS</a></li><li class="expanded "><a href="cps/cbncallcc.html"><strong aria-hidden="true">4.4.</strong> Other evaluation strategies</a></li><li class="expanded "><a href="cps/exceptions.html"><strong aria-hidden="true">4.5.</strong> Exceptions</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -170,6 +170,8 @@ material is... well, not lifted, but definitely influenced by his explanations.<
 <p>I will do my best to keep my personal comments restricted to the remarks. Any
 mistakes are mine. These notes will include no more SML code than was presented
 in lecture.</p>
+<p>This document is intended to be read as an <code>mdbook</code>, which, at the time of this
+writing, can be viewed <a href="https://hotc.camdar.io/">here</a>.</p>
 <p><a href="https://github.com/CT075/hotc">source</a></p>
 <h2><a class="header" href="#structure-of-the-compiler" id="structure-of-the-compiler">Structure of the Compiler</a></h2>
 <p>The compiler developed by this class will follow the following progression:</p>
@@ -858,22 +860,22 @@ so one approach for checking whether two constructors are equivalent is to
 beta-normalize them, then compare them structurally. This would work, but does
 not generalize well to later systems.</p>
 <p>The immediately relevant judgments are:</p>
-<p>| Judgment | Meaning |
-|---|---|
-| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \Rightarrow \overset{-}{k}\) | kind synthesis |
-| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \Leftarrow \overset{+}{k}\) | kind checking |
-| \(\overset{+}{\Gamma} \vdash \overset{+}{e} \Rightarrow \overset{-}{\tau}\) | type sythesis |
-| \(\overset{+}{\Gamma} \vdash \overset{+}{e} \Leftarrow \overset{+}{\tau}\) | type checking |</p>
+<table><thead><tr><th>Judgment</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \Rightarrow \overset{-}{k}\)</td><td>kind synthesis</td></tr>
+<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \Leftarrow \overset{+}{k}\)</td><td>kind checking</td></tr>
+<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{e} \Rightarrow \overset{-}{\tau}\)</td><td>type sythesis</td></tr>
+<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{e} \Leftarrow \overset{+}{\tau}\)</td><td>type checking</td></tr>
+</tbody></table>
 <p>The \(+\) and \(-\) symbols denote modality (\(+\) is input and \(-\) is output), but
 are not otherwise necessary. These
 judgments form a standard bidirectional typechecking (and kind-checking) algorithm.</p>
 <p>In the process, we will also need four more judgments:</p>
-<p>| Judgment | Meaning |
-|---|---|
-| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \Leftrightarrow \overset{+}{c'} : \overset{+}{k}\) | algorithmic equivalence |
-| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \leftrightarrow \overset{+}{c'} : \overset{-}{k}\) | structural equivalence |
-| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \Downarrow \overset{-}{c'}\) | weak-head normalization |
-| \(\overset{+}{\Gamma} \vdash \overset{+}{c} \rightsquigarrow \overset{-}{c'}\) | weak-head reduction |</p>
+<table><thead><tr><th>Judgment</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \Leftrightarrow \overset{+}{c'} : \overset{+}{k}\)</td><td>algorithmic equivalence</td></tr>
+<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \leftrightarrow \overset{+}{c'} : \overset{-}{k}\)</td><td>structural equivalence</td></tr>
+<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \Downarrow \overset{-}{c'}\)</td><td>weak-head normalization</td></tr>
+<tr><td>\(\overset{+}{\Gamma} \vdash \overset{+}{c} \rightsquigarrow \overset{-}{c'}\)</td><td>weak-head reduction</td></tr>
+</tbody></table>
 <h2><a class="header" href="#inference-rules" id="inference-rules">Inference Rules</a></h2>
 <p><strong>Rules 1.5 (Type synthesis):</strong> \(\Gamma \vdash e \Rightarrow \tau\)</p>
 <p>\[\require{bussproofs}
@@ -1147,15 +1149,15 @@ subsume normal arrow and (non-dependent) product kinds, giving us</p>
 for \(\Pi(\alpha:k).k'\) and \(\Sigma(\alpha:k).k'\) respectively if \(k\) is not
 free in \(k'\).</p>
 <p>The judgments we will use are</p>
-<p>| Judgment | Meaning |
-|---|---|
-| \(\Gamma \vdash k:\text{kind}\) | Kind validity |
-| \(\Gamma \vdash k \equiv k' : \text{kind}\) | Kind equivalence |
-| \(\Gamma \vdash k \le k'\) | Subkinding |
-| \(\Gamma \vdash c: k\) | Kinding |
-| \(\Gamma \vdash c \equiv c' : k\) | Constructor equivalence |
-| \(\Gamma \vdash e : \tau\) | Typing (same as \(F_\omega\)) |
-| \(\phantom{\Gamma} \vdash \Gamma\ ok\) | Context well-formedness |</p>
+<table><thead><tr><th>Judgment</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>\(\Gamma \vdash k:\text{kind}\)</td><td>Kind validity</td></tr>
+<tr><td>\(\Gamma \vdash k \equiv k' : \text{kind}\)</td><td>Kind equivalence</td></tr>
+<tr><td>\(\Gamma \vdash k \le k'\)</td><td>Subkinding</td></tr>
+<tr><td>\(\Gamma \vdash c: k\)</td><td>Kinding</td></tr>
+<tr><td>\(\Gamma \vdash c \equiv c' : k\)</td><td>Constructor equivalence</td></tr>
+<tr><td>\(\Gamma \vdash e : \tau\)</td><td>Typing (same as \(F_\omega\))</td></tr>
+<tr><td>\(\phantom{\Gamma} \vdash \Gamma\ ok\)</td><td>Context well-formedness</td></tr>
+</tbody></table>
 <p>The addition of singleton kinds necessitates subkinding to handle cases like
 <code>int</code>, which has kind \(*\) but <em>also</em> kind \(S(\texttt{int})\).</p>
 <p><strong>Rules 2.1 (Kind validity):</strong> \(\Gamma \vdash k:\text{kind}\)</p>
@@ -1561,20 +1563,20 @@ make sense to me. Maybe I'll do the full proof out later.</li>
 judgements should look familiar (for ease of typesetting I'm choosing to use
 superscripts for modes instead of writing it on top of the character from here
 onwards).</p>
-<p>| Judgment | Meaning |
-|---|---|
-| \(\Gamma^+ \vdash k^+ \Leftarrow \text{kind}\) | Kind validity |
-| \(\Gamma^+ \vdash k^+ \Leftrightarrow k'^+ : \text{kind}\) | Kind equivalence |
-| \(\Gamma^+ \vdash k^+ \unlhd k'^+\) | Subkinding |
-| \(\Gamma^+ \vdash c^+ \Rightarrow k^-\) | Kind synthesis |
-| \(\Gamma^+ \vdash c^+ \Leftarrow k^+\) | Kind checking |
-| \(\Gamma^+ \vdash c^+ \uparrow k^- \) | Natural kind |
-| \(\Gamma^+ \vdash c^+ \Leftrightarrow c'^+ : k^+\) | Algorithmic equivalence |
-| \(\Gamma^+ \vdash c^+ \leftrightarrow c'^+ : k^-\) | Structural path equivalence |
-| \(\Gamma^+ \vdash c^+ \rightsquigarrow c'^-\) | Weak-head reduction |
-| \(\Gamma^+ \vdash c^+ \Downarrow c'^-\) | Weak-head normalization |
-| \(\Gamma^+ \vdash e^+ \Rightarrow \tau^-\) | Type synthesis |
-| \(\Gamma^+ \vdash e^+ \Leftarrow \tau^+\) | Type checking |</p>
+<table><thead><tr><th>Judgment</th><th>Meaning</th></tr></thead><tbody>
+<tr><td>\(\Gamma^+ \vdash k^+ \Leftarrow \text{kind}\)</td><td>Kind validity</td></tr>
+<tr><td>\(\Gamma^+ \vdash k^+ \Leftrightarrow k'^+ : \text{kind}\)</td><td>Kind equivalence</td></tr>
+<tr><td>\(\Gamma^+ \vdash k^+ \unlhd k'^+\)</td><td>Subkinding</td></tr>
+<tr><td>\(\Gamma^+ \vdash c^+ \Rightarrow k^-\)</td><td>Kind synthesis</td></tr>
+<tr><td>\(\Gamma^+ \vdash c^+ \Leftarrow k^+\)</td><td>Kind checking</td></tr>
+<tr><td>\(\Gamma^+ \vdash c^+ \uparrow k^- \)</td><td>Natural kind</td></tr>
+<tr><td>\(\Gamma^+ \vdash c^+ \Leftrightarrow c'^+ : k^+\)</td><td>Algorithmic equivalence</td></tr>
+<tr><td>\(\Gamma^+ \vdash c^+ \leftrightarrow c'^+ : k^-\)</td><td>Structural path equivalence</td></tr>
+<tr><td>\(\Gamma^+ \vdash c^+ \rightsquigarrow c'^-\)</td><td>Weak-head reduction</td></tr>
+<tr><td>\(\Gamma^+ \vdash c^+ \Downarrow c'^-\)</td><td>Weak-head normalization</td></tr>
+<tr><td>\(\Gamma^+ \vdash e^+ \Rightarrow \tau^-\)</td><td>Type synthesis</td></tr>
+<tr><td>\(\Gamma^+ \vdash e^+ \Leftarrow \tau^+\)</td><td>Type checking</td></tr>
+</tbody></table>
 <p>As our term and constructor language is entirely unchanged from \(F_\omega\), we
 can import the type checking/synthesis rules nearly wholesale. The only change
 is that we now need to check that the kind introduced by a \(\forall\) introduction
@@ -2143,7 +2145,8 @@ what language the given term is in.</p>
 <p>where \(e\) is in the source and \(e'\) is in the target language.</p>
 <p>Note that we can actually use a syntax-directed translation of constructors,
 kinds and contexts. For a more complex constructor language, we may need to
-perform a <em>kind</em>-directed translation, but thankfully that is not the case here.</p>
+perform a <em>kind</em>-directed translation, but we will avoid that for reasons to
+be discussed.</p>
 <p>A translation, then, should have the following regularity conditions:</p>
 <ol>
 <li>\(\Gamma \vdash_S \tau: *\) if and only if \(\overline{\Gamma} \vdash_T
@@ -2197,6 +2200,38 @@ as we can simply delete the translations from every premise and conclusion
 to show what we need.</li>
 <li>Was not given in lecture; can be proven relatively easily for yourself.</li>
 </ol>
+<h2><a class="header" href="#coherence" id="coherence">Coherence</a></h2>
+<p>An important property of translations in general is <em>coherence</em>, namely that
+translations are unique.</p>
+<p>Suppose that \(\Gamma \vdash_S e:\tau\), and so \(\Gamma \vdash e:\tau
+\rightsquigarrow e'\). What if we also have \(\Gamma \vdash e:\tau \rightsquigarrow
+e''\)? In our cases, this will generally be impossible, as our translations are
+based on typing judgments and typing judgments are unique. In real languages, on
+the other hand, this is not necessarily the case. The statement of coherence,
+then, in this case, is that \(e' = e''\). It is <em>very</em> difficult to prove this, so
+we won't.</p>
+<p>For example, what if we're in a language with subtyping? The typical subsumption
+rule,</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e:\tau$}
+\AxiomC{$\Gamma \vdash \tau' \le \tau$}
+\BinaryInfC{$\Gamma \vdash e:\tau'$}
+\end{prooftree}
+\]</p>
+<p>actually translates to <em>coercion</em> code in a type-directed setting:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e:\tau \rightsquigarrow e'$}
+\AxiomC{$\Gamma \vdash \tau' \le \tau \rightsquigarrow f$}
+\BinaryInfC{$\Gamma \vdash e:\tau' \rightsquigarrow f\ e'$}
+\end{prooftree}
+\]</p>
+<p>where \(f\) is the function witnessing that \(\tau'\) subsumes \(\tau\). Of course,
+as SML lacks subtyping, we aren't going to bother.</p>
+<p>This does, however, bring us back to why we don't perform a kind-directed
+translation for type constructors -- we <em>do</em> have subkinding! So designing a
+coherent system for that becomes much more difficult.</p>
 <h2><a class="header" href="#remarks-4" id="remarks-4">Remarks</a></h2>
 <ul>
 <li>In lecture, Prof. Crary chose to use \(\overline{e}\) as the &quot;output&quot; of the
@@ -2205,10 +2240,435 @@ operator, just taking the symbol \(\overline{e}\) as a suggestive variable
 name. I have taken the liberty of rephrasing the rules to use something
 else for the sake of my own confusion.</li>
 <li>I did a few cases of the proof of the translation from IL-Direct to IL-CPS
-and it seems to be fairly trivial. The third condition can be shown by
-induction over the translation rules, but is muddied by the presence of
+and it seems to be fairly straightforward. The third condition can be shown
+by induction over the translation rules, but is muddied by the presence of
 different syntactic classes.</li>
+<li>Later, there was some discussion about Kleene equivalence, but I zoned out
+and didn't catch a lot of it (it wasn't particularly relevant to this
+material). It is a weaker property than full dynamic equivalence; it holds
+when \(e_1\) halts iff \(e_2\) halts.</li>
 </ul>
+<h1><a class="header" href="#introduction-to-continuation-passing-style" id="introduction-to-continuation-passing-style">Introduction to Continuation Passing Style</a></h1>
+<p>Before we can discuss the translation, we must specify our source and target
+languages.</p>
+<h2><a class="header" href="#source-il-direct" id="source-il-direct">Source: IL-Direct</a></h2>
+<table><thead><tr><th>Sort</th><th></th><th></th></tr></thead><tbody>
+<tr><td>Kinds</td><td>\(k:=\)</td><td>\(* \mid S(c) \mid \Pi(\alpha:k).k \mid \Sigma(\alpha:k).k\)</td></tr>
+<tr><td>Tycons</td><td>\(c:=\)</td><td>\(\alpha \mid \lambda(\alpha:k).c \mid c\ c \mid \langle c, c\rangle \mid \pi_1c \mid \pi_2c\)</td></tr>
+<tr><td>(Types)</td><td>\((\tau)\)</td><td>\(\phantom{\alpha} \mid \forall(\alpha:k).\tau \mid \tau \rightarrow \tau \mid \tau \times \tau\)</td></tr>
+<tr><td>Terms</td><td>\(e:=\)</td><td>\(x \mid \Lambda(\alpha:k).e \mid e[c] \mid \lambda(x:\tau).e \mid e\ e\)</td></tr>
+<tr><td></td><td></td><td>\(\phantom{x} \mid \langle e, e \rangle \mid \pi_1e \mid \pi_2e\)</td></tr>
+</tbody></table>
+<p>For the most part, the kinds and the non-\(\tau\) type constructors will be the
+same for the rest of the class. The <em>types</em>, on the other hand, will be changing
+quite frequently, as will the terms (obviously). In a real implementation, we'll
+also be adding some <em>actual</em> base types, like <code>int</code>, <code>bool</code>, <code>exn</code>, <code>ref</code>, etc.</p>
+<h2><a class="header" href="#target-il-cps" id="target-il-cps">Target: IL-CPS</a></h2>
+<table><thead><tr><th>Sort</th><th></th><th></th></tr></thead><tbody>
+<tr><td>Kinds</td><td>\(k:=\)</td><td>same</td></tr>
+<tr><td>Tycons</td><td>\(c:=\)</td><td>same</td></tr>
+<tr><td>(Types)</td><td>\((\tau)\)</td><td>\(\dots \mid \exists(\alpha:k).\tau \mid \neg\tau \mid \tau \times \tau\)</td></tr>
+<tr><td>Values</td><td>\(v:=\)</td><td>\(x \mid \lambda(x:\tau).e \mid \langle v, v \rangle \mid pack\ [c,v]\ as\ \exists(\alpha:k).\tau\)</td></tr>
+<tr><td>Expressions</td><td>\(e:=\)</td><td>\(let\ x=v\ in\ e \mid v\ v \mid let\ x = \pi_1v\ in\ e \mid let\ x = \pi_2v\ in\ e\)</td></tr>
+<tr><td></td><td></td><td>\(\phantom{x} \mid unpack\ [\alpha,x] = v\ in\ e \mid halt\)</td></tr>
+</tbody></table>
+<p>Properly, we might notate \(\neg\tau\) as \(\tau \rightarrow answer\) or \(\tau
+\rightarrow 0\), to notate that lambdas (really, continuations) don't return.
+However, by marking it as \(\neg\tau\), some of the type relationships become more
+obvious. Similarly, the \(v\ v\) syntactic form is more of a jump than a function
+call.</p>
+<p>If we had booleans (particularly if-then-else), we might add \(if\ v\ then\ e\ else\ e\)
+for this. Instead of nesting expressions, we need to <em>bind</em> them into values
+before they can be used. For this reason, this is a &quot;monadic form&quot;.</p>
+<h2><a class="header" href="#basic-principles" id="basic-principles">Basic Principles</a></h2>
+<p>When translating kinds and contexts, we can largely do the obvious thing. With
+types, on the other hand, we have some work to do. We have</p>
+<p>\[\require{bussproofs}\overline{\tau_1 \rightarrow \tau_2} = \neg(\overline{\tau_1} \times \neg
+\overline{\tau_2})\]</p>
+<p>Intuitively, we can think of a function, in CPS, as a jump taking the standard
+parameter (\(\overline{\tau_1}\)) and also a continuation argument telling where
+to jump with the result (\(\neg\overline{\tau_2}\)). In the theory, the slick way
+to see it is that \(A \implies B\) is equivalent to \(\neg A \lor B\), which is
+in turn equivalent to \(\neg (A \land \neg B)\) by De Morgan's law. It turns out
+that programming in the presence of continuations actually encodes <em>classical</em>
+logic under Curry-Howard, where the proof of a proposition \(\tau\) can be
+contradicted with (thrown to) a <em>continuation</em> \(\neg \tau\), which diverges
+(produces \(\bot\)). Classical and constructive logic coincide on \(\Pi_2\)
+sentences, which are sentences of the form \(\forall \dots \forall . \exists
+\dots \exists . p\) (either of the quantifier prefix lists can be empty), where
+\(p\) is a decidable proposition.</p>
+<p>By Curry-Howard, the translation \(M:A \rightsquigarrow \overline{M}:
+\overline{A}\) transforms the proof \(M\) to remove uses of double negation
+elimination (known in PL parlance as <code>callcc</code>). If \(A\) is \(\Pi_2\), we can
+extract a proof of \(A\) from a proof of \(\overline{A}\) in this way.</p>
+<p>You may also notice that IL-CPS does not have \(\forall\) types, only \(\exists\).
+We use the translation</p>
+<p>\[\overline{\forall(\alpha:k).\tau} = \neg(\exists(\alpha:\overline{k}).\neg
+\overline{\tau})\]</p>
+<p>again using the classical tautology \(\forall x.p \Leftrightarrow \neg \exists
+x. (\neg p)\). Computationally, this transforms a <em>function</em> taking the
+constructor \(\alpha\) and returning a value into a continuation that takes an
+<em>existential</em> holding \(\alpha\) and an internal continuation taking the resulting
+\(\tau\) value. We don't actually want to have \(\forall(\alpha:k).\tau\) as a
+type in our CPS language. It is workable, but very strange -- some function
+calls become <em>values</em>, and so on. Doing this actually produces better code at
+the expense of some unfortunate semantics (for example, the value restriction
+resurfaces).</p>
+<p>Some regularity conditions:</p>
+<ol>
+<li>If \(\Gamma \vdash k:\text{kind}\), then \(\overline{\Gamma} \vdash \overline{k}
+:\text{kind}\)</li>
+<li>If \(\Gamma \vdash c:k\), then \(\overline{\Gamma} \vdash \overline{c}:\overline{k}\)</li>
+</ol>
+<p>A third property that's nice to have is that the translation commutes with
+substitution:</p>
+<p>\[\overline{[c_1/\alpha]c_2} = [\overline{c_1}/\alpha]\overline{c_2}\]</p>
+<p>which holds if we don't mess with the variables.</p>
+<p>The translation judgment itself will need to be a little weird to accommodate
+the CPS property. Instead of using the typical \(\Gamma \vdash e:\tau \rightsquigarrow
+e'\), we're going to bind an explicit continuation argument \(\Gamma \vdash
+e:\tau \rightsquigarrow x.e'\), where \(x\) is a bound continuation of type \(\neg
+\overline\tau\). We can think of this translation as assuming a continuation
+to pass the &quot;result&quot; of evaluating the expression \(e\) to.</p>
+<p>Properly, of course, continuation arguments are named \(k\) by convention. We
+already use \(k\) for kinds, but the two appear in different contexts, so there's
+no possibility of confusion.</p>
+<h2><a class="header" href="#statics-of-il-cps" id="statics-of-il-cps">Statics of IL-CPS</a></h2>
+<p>Because of the value-expression modality, we need to adjust our definition of
+static correctness:</p>
+<ul>
+<li>If \(\Gamma \vdash e:\tau \rightsquigarrow k.e'\) and \(\vdash \Gamma\ ok\), then
+\(\overline{\Gamma}, k:\neg \overline{\tau} \vdash e':0\)</li>
+</ul>
+<p>The \(0\) in this expression typing judgment denotes that, in this language,
+expressions diverge -- they have type <code>void</code>, effectively. Values, of course,
+are typed as usual.</p>
+<p>IL-CPS, then, is defined statically as follows:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma(x) = \tau$}
+\UnaryInfC{$\Gamma \vdash x:\tau$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \tau:*$}
+\AxiomC{$\Gamma, x:\tau \vdash e:0$}
+\BinaryInfC{$\Gamma \vdash \lambda(x:\tau).e : \neg \tau$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash v_1:\tau_1$}
+\AxiomC{$\Gamma \vdash v_2:\tau_2$}
+\BinaryInfC{$\Gamma \vdash \langle v_1, v_2 \rangle : \tau_1 \times \tau_2$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash c:k$}
+\AxiomC{$\Gamma \vdash v:[c/\alpha]\tau$}
+\AxiomC{$\Gamma, \alpha:k \vdash \tau:*$}
+\TrinaryInfC{$\Gamma \vdash pack\ [c,v]\ in\ \exists(\alpha:k).\tau$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash v_1:\neg \tau$}
+\AxiomC{$\Gamma \vdash v_2:\tau$}
+\BinaryInfC{$\Gamma \vdash v_1\ v_2:0$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash v:\tau$}
+\AxiomC{$\Gamma, x:\tau \vdash e:0$}
+\BinaryInfC{$\Gamma \vdash let\ x=v\ in\ e:0$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash x:\tau_1 \times \tau_2$}
+\AxiomC{$\Gamma, x:\tau_1 \vdash e:0$}
+\BinaryInfC{$\Gamma \vdash let\ x=\pi_1v\ in\ e:0$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash x:\tau_1 \times \tau_2$}
+\AxiomC{$\Gamma, x:\tau_2 \vdash e:0$}
+\BinaryInfC{$\Gamma \vdash let\ x=\pi_2v\ in\ e:0$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash v:\exists(\alpha:k).\tau$}
+\AxiomC{$\Gamma,\alpha:k,x:\tau \vdash e:0$}
+\BinaryInfC{$\Gamma \vdash unpack\ [\alpha,x]=v\ in\ e:0$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{}
+\UnaryInfC{$\Gamma \vdash halt:0$}
+\end{prooftree}
+\]</p>
+<h1><a class="header" href="#basic-translation" id="basic-translation">Basic Translation</a></h1>
+<p>Our initial discussion of CPS transformation centers around &quot;direct-style&quot; code,
+which features no abnormal control flow operators (exceptions, continuations,
+etc).</p>
+<p>We discussed this a bit briefly in the last section, but here are the collected
+type translation rules for IL-CPS:</p>
+<p>\[\require{bussproofs}
+\begin{aligned}
+\overline{\alpha} &amp;= \alpha \\
+\overline{\tau_1 \times \tau_2} &amp;= \neg(\overline{\tau_1} \times \overline{\tau_2}) \\
+\overline{\tau_1 \rightarrow \tau_2} &amp;= \neg(\overline{\tau_1} \times \neg
+\overline{\tau_2}) \\
+\overline{\forall(\alpha:k).\tau} &amp;= \neg(\exists(\alpha:\overline{k}).
+\neg\overline{\tau})
+\end{aligned}
+\]</p>
+<p><strong>Rules 3.1 (CPS-conversion):</strong> \(\Gamma \vdash e:\tau \rightsquigarrow k.e'\)</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma(x) = \tau$}
+\UnaryInfC{$\Gamma \vdash x:\tau \rightsquigarrow k.k\ x$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:\tau_1 \rightsquigarrow k_1.e_1'$}
+\AxiomC{$\Gamma \vdash e_2:\tau_2 \rightsquigarrow k_2.e_2'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash \langle e_1, e_2 \rangle :\tau_1 \times \tau_2 \rightsquigarrow k.&amp;
+let\ k_1= \lambda(x_1:\overline{\tau_1}).\\
+&amp;\quad (let\ k_2=\lambda(x_2:\overline{\tau_2}).k \langle x_1, x_2 \rangle
+\ in\ e_2') \\
+&amp;in\ e_1'
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e : \tau_1 \times \tau_2 \rightsquigarrow k.e'$}
+\UnaryInfC{$
+\begin{aligned}
+\Gamma \vdash \pi_ie : \tau_i \rightsquigarrow k'.&amp;
+let\ k=\lambda(x:\overline{\tau_1} \times \overline{\tau_2}). \\
+&amp;\quad (let\ y = \pi_ix\ in\ k'\ y) \\
+&amp;in\ e'
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \tau:*$}
+\AxiomC{$\Gamma, x:\tau \vdash e:\tau' \rightsquigarrow k.e'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash \lambda(x:\tau).e: \tau \rightarrow \tau' \rightsquigarrow k'.
+&amp;k' (\lambda(y:\overline{\tau} \times \neg\overline{\tau'}). \\
+&amp;\qquad let\ x=\pi_1y\ in \\
+&amp;\qquad let\ k=\pi_2y\ in\ e')
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:\tau_1 \rightarrow \tau_2 \rightsquigarrow
+k_1.e_1'$}
+\AxiomC{$\Gamma \vdash e_2:\tau_1 \rightsquigarrow k_2.e_2'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash e_1\ e_2:\tau' \rightsquigarrow k.&amp;let\ k_1 =
+\lambda(x_1:\neg(\overline{\tau_1}\times \neg\overline{\tau_2})). \\
+&amp;\quad (let\ k_2 = \lambda(x_2:\tau_1).x_1\langle x_2,k \rangle\ in\ e_2') \\
+&amp;in\ e_1'
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash k: \text{kind}$}
+\AxiomC{$\Gamma, \alpha:k \vdash \tau:*$}
+\AxiomC{$\Gamma, \alpha:k \vdash e:\tau \rightsquigarrow k.e'$}
+\TrinaryInfC{$
+\begin{aligned}
+\Gamma \vdash \Lambda(\alpha:k).e : \forall(\alpha:k).\tau \rightsquigarrow k'.
+&amp;k'( \lambda(y:\exists(\alpha:\overline{k}).\neg \overline{\tau}).\\
+&amp;\quad unpack [\alpha,k] = y\ in\ e')
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e:\forall(\alpha:k).\tau \rightsquigarrow k.e'$}
+\AxiomC{$\Gamma \vdash c:k$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash e[c]:[c/\alpha]\tau \rightsquigarrow k'.&amp;
+let\ k=\lambda(f:\neg(\exists(\alpha:\overline{k}).\neg\overline{\tau})). \\
+&amp;\quad f(pack\ [\overline{c},k']\ as\ \exists(\alpha:\overline{k}).
+\neg \overline{\tau}) \\
+&amp;in\ e'
+\end{aligned}
+$}
+\end{prooftree}
+\]</p>
+<p>The important thing to keep in mind while devising these rules is that, when we
+recursively translate a
+sub-expression \(e\), we are given some bound term \(k.e'\), in which the bound \(k\)
+is a continuation taking the &quot;result&quot; of \(e'\) as input. When we <em>use</em> this
+result, then, \(k\) is <em>free</em>! To complete the translation, then, we have to
+re-bind \(k\) to be a continuation of the correct type
+(particularly, \(k\) has type \(\neg \overline\tau\) if \(e\) has type \(\tau\)).</p>
+<h2><a class="header" href="#remarks-5" id="remarks-5">Remarks</a></h2>
+<ul>
+<li>I personally found it easier to chase types rather than try to reason through
+the control flow. The two main patterns I used for intuition are that
+\(let\ k=\dots\ in\ e\) is the translation of &quot;evaluate \(e \rightsquigarrow
+k.e\)&quot; and \(k\ v\) is the translation of &quot;\(v\) is a value&quot;.</li>
+</ul>
+<h1><a class="header" href="#other-evaluation-strategies" id="other-evaluation-strategies">Other evaluation strategies</a></h1>
+<p>In this section, we discuss CPS conversion for a few other evaluation schemes.</p>
+<h2><a class="header" href="#call-by-name" id="call-by-name">Call by Name</a></h2>
+<p>The primary counterpart to so-called &quot;strict&quot; evaluation is &quot;lazy&quot; evaluation,
+otherwise known as &quot;call by name&quot; (as opposed to &quot;call by value&quot;) semantics.
+The key difference, of course, is that sub-expressions aren't evaluated until
+they are eliminated, leading to things like function arguments being passed as
+thunks, and so on.</p>
+<p>As the key idea behind CPS is to make ccontrol flow very explicit, it stands to
+reason that it doesn't matter whether IL-CPS is by name or by value, something
+that the expression-value divide enforces. The difference, then, is expressed
+in the <em>translation</em> from a call-by-name language to continuation passing style.</p>
+<p>Conceptually, this works out with bound variables in contexts having a moral
+type of \(\neg \neg \tau\) (taking in the &quot;what do I do next&quot; continuation),
+rather than \(\tau\). The primary place this manifests is in the translation of
+contexts:</p>
+<p>\[\require{bussproofs}\overline{\Gamma, x:\tau} = \overline{\Gamma}, x:\neg\neg\overline\tau\]</p>
+<p>We also need to adjust our translation of function types to account for this:</p>
+<p>\[\overline{\tau_1 \rightarrow \tau_2} =
+\neg(\neg \neg \overline{\tau_1} \times \neg \overline{\tau_2})
+\]</p>
+<p>Now, as it turns out, we can get away with only changing a few rules from their
+previous definitions:</p>
+<p><strong>Rules 3.2 (Call by name translation)</strong></p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma(x) = \tau$}
+\UnaryInfC{$\Gamma \vdash x:\tau \rightsquigarrow x\ k$}
+\end{prooftree}
+\]</p>
+<p>Remember that here, the translated \(x\) has type \(\neg\neg \tau\), so instead of
+passing the final value \(x\) to \(k\), we pass the continuation \(k\) to \(x\).</p>
+<p><em>Rules 3.2 cont'd</em></p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \tau_1:*$}
+\AxiomC{$\Gamma, x:\tau \vdash e:\tau_2 \rightarrow k.e'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash \lambda(x:\tau).e:\tau_1 \rightarrow \tau_2 \rightsquigarrow k'.
+k'(&amp;\lambda(y:\neg\neg\overline{\tau_1} \times \neg\overline{\tau_2}).\\
+&amp;\quad let\ x=\pi_1y\ in \\
+&amp;\quad let\ k=\pi_2y\ in\ e')
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:\tau_1 \rightarrow \tau_2 \rightsquigarrow k_1.e_1'$}
+\AxiomC{$\Gamma \vdash e_2:\tau_1 \rightsquigarrow k_2.e_2'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash e_1\ e_2:\tau_2 \rightsquigarrow k.&amp;
+let\ k_1 = \lambda(f:\neg(\neg \neg \overline{\tau_1}\times \neg\overline{\tau_2})).
+\\
+&amp;\quad f \langle (\lambda(k_2:\neg\overline{\tau_1}).e_2'), k\rangle \\
+&amp;in\ e_1'
+\end{aligned}
+$}
+\end{prooftree}
+\]</p>
+<p>The function rule is actually almost completely the same, but is reproduced to
+demonstrate the type change. In the application rule, instead of evaluating the
+argument \(e_2'\), we reify it as a thunk to pass as the first argument to the
+resultant jump.</p>
+<p>In fact, these are all the changes we need to change the previous translation
+into a call by name version! There are often other lazy constructs (such as lazy
+tuples), but we won't discuss them here.</p>
+<h3><a class="header" href="#aside-call-by-need" id="aside-call-by-need">Aside: Call by &quot;need&quot;</a></h3>
+<p>One issue with naive call by name is that, if a given input is used multiple
+times, it may need to be evaluated multiple times. These <em>can</em> be optimized out
+in some cases, but in the presence of effects this doesn't help in the general
+case. Instead, we can use some memoization to cache the results of computations
+after they've been used once. This is the evaluation strategy used by Haskell,
+which has the name &quot;call by need&quot;.</p>
+<p>Under the hood, this is used by storing a datatype <code>UNFORCED of unit -&gt; 'a | FORCED of 'a</code> for the lazy thunks, and then internally using a ref to track
+them, replacing <code>UNFORCED</code> with <code>FORCED</code> when necessary. This, ironically, leads
+to Haskell being less naively parallelizable than ML, as there are now mutable
+data dependencies to worry about (in an ostensibly completely pure language).
+To get around this, GHC actually does some strictness analysis, compiling what
+code it can to a call-by-value language, then leaving the rest as call by need.</p>
+<h2><a class="header" href="#callcc" id="callcc">Call/cc</a></h2>
+<p>Scheme popularized the idea of reified first-class continuations with the
+<code>callcc</code> construct. For use of this concept, SMLNJ exposes two functions:</p>
+<pre><code class="language-ocaml">callcc: ('a cont -&gt; 'a) -&gt; 'a
+throw: 'a cont * 'a -&gt; 'b
+</code></pre>
+<p>Instead of using functions, however, we're going to make these primitive
+constructs in our source language, defined statically as:</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma, x:\tau\ cont \vdash e:\tau$}
+\AxiomC{$\Gamma \vdash \tau:*$}
+\BinaryInfC{$\Gamma \vdash letcc\ x\ in\ e:\tau$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:\tau$}
+\AxiomC{$\Gamma \vdash e_2:\tau\ cont$}
+\AxiomC{$\Gamma \vdash \tau':*$}
+\TrinaryInfC{$\Gamma \vdash throw\ e_1\ to\ e_2:\tau'$}
+\end{prooftree}
+\]</p>
+<p>Suggestively, the target language is <em>continuation passing style</em> for a reason,
+which suggests the translation of \(\tau\ cont\) to \(\neg \tau\). We can translate
+these two new constructs as</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma, x:\tau\ cont \vdash e:\tau \rightsquigarrow k.e'$}
+\AxiomC{$\Gamma \vdash \tau:*$}
+\BinaryInfC{$\Gamma \vdash letcc\ x\ in\ e:\tau \rightsquigarrow k.
+let\ x=k\ in\ e'$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:\tau \rightsquigarrow k_1.e_1'$}
+\AxiomC{$\Gamma \vdash e_2:\tau\ cont \rightsquigarrow k_2.e_2'$}
+\AxiomC{$\Gamma \vdash \tau':*$}
+\TrinaryInfC{$
+\begin{aligned}
+\Gamma \vdash throw\ e_1\ to\ e_2:\tau' \rightsquigarrow k.&amp;
+let\ k_1=\lambda(x:\overline{\tau}).\\
+&amp;\quad let\ k_2=\lambda(f:\neg\overline{\tau}).f\ x\ in\ e_2'\\
+&amp;in\ e_1'
+\end{aligned}
+$}
+\end{prooftree}
+\]</p>
+<p>Unsurprisingly, \(letcc\) involves capturing the current continuation, which is
+<em>conveniently</em> passed as the bound \(k\). For \(throw\), we evaluate both \(e_1\) and
+\(e_2\), and then pass the result of \(e_2\) to the continuation hidden in \(e_2\).</p>
+<h2><a class="header" href="#remarks-6" id="remarks-6">Remarks</a></h2>
+<ul>
+<li>I'm not entirely sure what the issue is with refs in parallel for Haskell.
+Even if multiple threads try to write to the ref cell at once (assuming
+atomic reads and writes, of course), there would be no correctness issues,
+as both threads would be writing the same value anyway (in a pure language).
+Prof. Crary said that this kind of strategy causes issues with garbage
+collection but didn't go into detail.</li>
+</ul>
+<h1><a class="header" href="#exceptions" id="exceptions">Exceptions</a></h1>
+<p>TODO</p>
 
                     </main>
 

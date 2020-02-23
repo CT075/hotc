@@ -12,3 +12,7 @@
 - [Aside: Binding](binding/README.md)
 - [Unit 3: Continuation Passing Style](cps/README.md)
     - [Primer: Type-directed translation](cps/tdt.md)
+    - [Introduction to CPS](cps/basic.md)
+    - [Call by Value CPS](cps/direct.md)
+    - [Other evaluation strategies](cps/cbncallcc.md)
+    - [Exceptions](cps/exceptions.md)

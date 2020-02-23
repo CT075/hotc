@@ -70,7 +70,8 @@ where $e$ is in the source and $e'$ is in the target language.
 
 Note that we can actually use a syntax-directed translation of constructors,
 kinds and contexts. For a more complex constructor language, we may need to
-perform a *kind*-directed translation, but thankfully that is not the case here.
+perform a *kind*-directed translation, but we will avoid that for reasons to
+be discussed.
 
 A translation, then, should have the following regularity conditions:
 
@@ -132,6 +133,47 @@ of the regularity conditions may look like:
     to show what we need.
 3. Was not given in lecture; can be proven relatively easily for yourself.
 
+## Coherence
+
+An important property of translations in general is *coherence*, namely that
+translations are unique.
+
+Suppose that $\Gamma \vdash_S e:\tau$, and so $\Gamma \vdash e:\tau
+\rightsquigarrow e'$. What if we also have $\Gamma \vdash e:\tau \rightsquigarrow
+e''$? In our cases, this will generally be impossible, as our translations are
+based on typing judgments and typing judgments are unique. In real languages, on
+the other hand, this is not necessarily the case. The statement of coherence,
+then, in this case, is that $e' = e''$. It is *very* difficult to prove this, so
+we won't.
+
+For example, what if we're in a language with subtyping? The typical subsumption
+rule,
+
+$$
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e:\tau$}
+\AxiomC{$\Gamma \vdash \tau' \le \tau$}
+\BinaryInfC{$\Gamma \vdash e:\tau'$}
+\end{prooftree}
+$$
+
+actually translates to *coercion* code in a type-directed setting:
+
+$$
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e:\tau \rightsquigarrow e'$}
+\AxiomC{$\Gamma \vdash \tau' \le \tau \rightsquigarrow f$}
+\BinaryInfC{$\Gamma \vdash e:\tau' \rightsquigarrow f\ e'$}
+\end{prooftree}
+$$
+
+where $f$ is the function witnessing that $\tau'$ subsumes $\tau$. Of course,
+as SML lacks subtyping, we aren't going to bother.
+
+This does, however, bring us back to why we don't perform a kind-directed
+translation for type constructors -- we *do* have subkinding! So designing a
+coherent system for that becomes much more difficult.
+
 ## Remarks
 
 - In lecture, Prof. Crary chose to use $\overline{e}$ as the "output" of the
@@ -143,4 +185,8 @@ of the regularity conditions may look like:
     and it seems to be fairly straightforward. The third condition can be shown
     by induction over the translation rules, but is muddied by the presence of
     different syntactic classes.
+- Later, there was some discussion about Kleene equivalence, but I zoned out
+    and didn't catch a lot of it (it wasn't particularly relevant to this
+    material). It is a weaker property than full dynamic equivalence; it holds
+    when $e_1$ halts iff $e_2$ halts.
 
