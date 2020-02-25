@@ -20,7 +20,7 @@ impl SvgBobber {
 fn process_content(s: &String) -> Result<String, Error> {
     let mut buf = String::with_capacity(s.len());
     let mut in_code = false;
-    let options = Options::empty();
+    let options = Options::all();
     let events = Parser::new_ext(&*s, options).filter_map(|e| match e {
         Event::Start(Tag::CodeBlock(s)) => {
             let s = s.into_string();
