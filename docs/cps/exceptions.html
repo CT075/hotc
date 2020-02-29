@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="../binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="../cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="../cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li><li class="expanded "><a href="../cps/basic.html"><strong aria-hidden="true">4.2.</strong> Introduction to CPS</a></li><li class="expanded "><a href="../cps/direct.html"><strong aria-hidden="true">4.3.</strong> Call by Value CPS</a></li><li class="expanded "><a href="../cps/cbncallcc.html"><strong aria-hidden="true">4.4.</strong> Other evaluation strategies</a></li><li class="expanded "><a href="../cps/exceptions.html" class="active"><strong aria-hidden="true">4.5.</strong> Exceptions</a></li></ol></li></ol>
+                <ol class="chapter"><li class="expanded affix "><a href="../index.html">Intro</a></li><li class="expanded "><a href="../fw/index.html"><strong aria-hidden="true">1.</strong> Unit 1: System Fw</a></li><li><ol class="section"><li class="expanded "><a href="../fw/system-f.html"><strong aria-hidden="true">1.1.</strong> Review: System F</a></li><li class="expanded "><a href="../fw/declarative.html"><strong aria-hidden="true">1.2.</strong> Declarative system</a></li><li class="expanded "><a href="../fw/algorithmic.html"><strong aria-hidden="true">1.3.</strong> Typechecking</a></li></ol></li><li class="expanded "><a href="../singleton/index.html"><strong aria-hidden="true">2.</strong> Unit 2: Singleton kinds</a></li><li><ol class="section"><li class="expanded "><a href="../singleton/declarative.html"><strong aria-hidden="true">2.1.</strong> Declarative system</a></li><li class="expanded "><a href="../singleton/algorithmic.html"><strong aria-hidden="true">2.2.</strong> Algorithmic rules</a></li></ol></li><li class="expanded "><a href="../binding/index.html"><strong aria-hidden="true">3.</strong> Aside: Binding</a></li><li class="expanded "><a href="../cps/index.html"><strong aria-hidden="true">4.</strong> Unit 3: Continuation Passing Style</a></li><li><ol class="section"><li class="expanded "><a href="../cps/tdt.html"><strong aria-hidden="true">4.1.</strong> Primer: Type-directed translation</a></li><li class="expanded "><a href="../cps/basic.html"><strong aria-hidden="true">4.2.</strong> Introduction to CPS</a></li><li class="expanded "><a href="../cps/direct.html"><strong aria-hidden="true">4.3.</strong> Call by Value CPS</a></li><li class="expanded "><a href="../cps/cbncallcc.html"><strong aria-hidden="true">4.4.</strong> Other evaluation strategies</a></li><li class="expanded "><a href="../cps/exceptions.html" class="active"><strong aria-hidden="true">4.5.</strong> Exceptions</a></li><li class="expanded "><a href="../cps/other.html"><strong aria-hidden="true">4.6.</strong> Closing Notes</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -151,8 +151,142 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#exceptions" id="exceptions">Exceptions</a></h1>
-<p>TODO</p>
+                        <h1><a class="header" href="#exception-passing" id="exception-passing">Exception passing</a></h1>
+<p>A more involved form of advanced control flow is that of exceptions that
+automatically propagate up the call stack until being handled.</p>
+<h2><a class="header" href="#aside-typed-exceptions" id="aside-typed-exceptions">Aside: Typed exceptions</a></h2>
+<p>In ML, the type <code>exn</code> is special in that new variants can be added to it at
+runtime. This is the so-called <em>extensible</em> type, a dynamically-growing sum
+type.</p>
+<p>This extensibility is actually entirely separate from the concept of exceptions
+as a control flow tool, despite the two being often conflated. To sidestep
+dealing with this issue, we will assume the existence of a type \(\tau_{ex}\),
+the type of <em>exception objects</em>. This type could be <code>int</code>, <code>void</code>, <code>exn</code>, or so
+on, it doesn't matter.</p>
+<h2><a class="header" href="#syntax-of-exceptions" id="syntax-of-exceptions">Syntax of exceptions</a></h2>
+<p>Statically, we will define exception handling as follows:</p>
+<p>\[\require{bussproofs}
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:\tau$}
+\AxiomC{$\Gamma, x:\tau_{ex} \vdash e_2:\tau$}
+\BinaryInfC{$\Gamma \vdash try\ e_1\ with\ x.e_2:\tau$}
+\end{prooftree} \qquad
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e:\tau_{ex}$}
+\AxiomC{$\Gamma \vdash \tau : *$}
+\BinaryInfC{$\Gamma \vdash raise\ e:\tau$}
+\end{prooftree}
+\]</p>
+<p>Because every expression may now have a separate evaluation condition (namely,
+&quot;raising an exception&quot;), we also need to change some our translation strategy.
+Previously, we only bound the one continuation <code>k</code> for the singular exit
+condition. Now, we'll also have a continuation <code>k_ex</code>, which is called with the
+raised exception of a given expression. For the obvious reason, this style of
+evaluation is often described as &quot;double-barrelled CPS&quot;.</p>
+<p>We also need to adjust our type translation:</p>
+<p>\[\overline{\tau_1 \rightarrow \tau_2} \rightsquigarrow \neg(\overline{\tau_1}
+\times \neg \overline{\tau_2} \times \neg \overline{\tau_{ex}})\]</p>
+<p>The translation judgment, then, becomes</p>
+<p>\[\Gamma \vdash e:\tau \rightsquigarrow k.k_{ex}.e'\]</p>
+<p>with coherence condition</p>
+<ul>
+<li>If \(\Gamma \vdash e:\tau \rightsquigarrow k.k_{ex}.e'\), and \(\vdash \Gamma
+\ ok\), then \(\overline{\Gamma}, k:\neg \overline{\tau}, k_{ex}:\neg
+\overline{\tau_{ex}} \vdash e':0\)</li>
+</ul>
+<p>In most cases, we will simply thread the same \(k_{ex}\) through the same
+translations developed in the previous section. For example, we might have</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:\tau_1 \rightsquigarrow k_1.k_{ex}.e_1'$}
+\AxiomC{$\Gamma \vdash e_2:\tau_2 \rightsquigarrow k_2.k_{ex}.e_2'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash \langle e_1, e_2 \rangle :\tau_1 \times \tau_2 \rightsquigarrow
+k.k_{ex}.&amp;
+let\ k_1= \lambda(x_1:\overline{\tau_1}).\\
+&amp;\quad (let\ k_2=\lambda(x_2:\overline{\tau_2}).k \langle x_1, x_2 \rangle
+\ in\ e_2') \\
+&amp;in\ e_1'
+\end{aligned}
+$}
+\end{prooftree}
+\]</p>
+<p>where we use the same exception handler for the premises as the conclusion.</p>
+<p><strong>Rules 3.3 (Double-barrelled CPS, selected rules only)</strong>: \(\Gamma \vdash e:\tau
+\rightsquigarrow k.k_{ex}.e'\)</p>
+<p>\[
+\begin{prooftree}
+\AxiomC{$\Gamma(x) = \tau$}
+\UnaryInfC{$\Gamma \vdash x:\tau \rightsquigarrow k.k_{ex}.k\ x$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \tau:*$}
+\AxiomC{$\Gamma, x:\tau \vdash e:\tau' \rightsquigarrow k'.k_{ex}'.e'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash \lambda(x:\tau).e: \tau \rightarrow \tau' \rightsquigarrow
+k.k_{ex}.
+&amp;k (\lambda (y:\overline{\tau} \times \neg\overline{\tau'} \times
+\neg\overline{\tau_{ex}}). \\
+&amp;\qquad let\ x=\pi_1y\ in \\
+&amp;\qquad let\ z=\pi_2y\ in \\
+&amp;\qquad let\ k'=\pi_1z\ in \\
+&amp;\qquad let\ k_{ex}'=\pi_2z\ in\ e')
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e_1:\tau \rightarrow \tau' \rightsquigarrow k_1.k_{ex}.e_1'$}
+\AxiomC{$\Gamma \vdash e_2:\tau \rightarrow \tau' \rightsquigarrow k_2.k_{ex}.e_2'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash e_1\ e_2 : \tau' \rightsquigarrow k.k_{ex}.
+&amp;let\ k_1' = \lambda(f:\neg(\overline{\tau} \times \neg\overline{\tau'} \times
+\neg\overline{\tau_{ex}})). \\
+&amp;\qquad (let\ k_2 = \lambda(x:\overline{\tau}).f \langle x,
+\langle k, k_{ex} \rangle \rangle\ in\ e_2') \\
+&amp;in\ e_1'
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash e:\tau \rightsquigarrow k.k_{ex}.e'$}
+\AxiomC{$\Gamma, x:\tau_{ex} \vdash e_{ex} : \tau \rightsquigarrow
+k.k_{ex}'.e_{ex}'$}
+\BinaryInfC{$
+\begin{aligned}
+\Gamma \vdash try\ e\ with\ x.e_{ex}:\tau \rightsquigarrow k.k_{ex}'.
+let\ k_{ex}=\lambda(x:\overline{\tau_{ex}}).e_{ex}'\ in\ e'
+\end{aligned}
+$}
+\end{prooftree}
+\]
+\[
+\begin{prooftree}
+\AxiomC{$\Gamma \vdash \tau:*$}
+\AxiomC{$\Gamma \vdash e:\tau_{ex} \rightsquigarrow k.k_{ex}.e'$}
+\BinaryInfC{$\Gamma \vdash raise_\tau\ e:\tau \rightsquigarrow k'.k_{ex}.[k_{ex}/k]e'$}
+\end{prooftree}
+\]</p>
+<p>Note that we are treating products as right-associative for the purpose of the
+\(\pi_1\) and \(\pi_2\) expressions. In the <code>raise</code> case, we can simply evaluate the
+exception expression \(e\), passing \(k_{ex}\) as its regular continuation. For
+<code>try...catch</code>, we need to replace the exception handler of \(e\) with a function
+that evaluates \(e_{ex}\), using an outer exception handler on the overall
+expression.</p>
+<h2><a class="header" href="#remarks" id="remarks">Remarks</a></h2>
+<ul>
+<li>It's more explicit how the <code>raise</code> rule works if we instead translate to
+<code>let k = (fn (x:t_ex) =&gt; k_ex x) in e'</code>. This is eta-reduced in the rule
+given.</li>
+</ul>
 
                     </main>
 
@@ -164,6 +298,10 @@
                             </a>
                         
 
+                        
+                            <a rel="next" href="../cps/other.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -178,6 +316,10 @@
                     </a>
                 
 
+                
+                    <a href="../cps/other.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 

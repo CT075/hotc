@@ -16,3 +16,4 @@
     - [Call by Value CPS](cps/direct.md)
     - [Other evaluation strategies](cps/cbncallcc.md)
     - [Exceptions](cps/exceptions.md)
+    - [Closing Notes](cps/other.md)
